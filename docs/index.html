@@ -12,13 +12,13 @@
   --ink-2: #47515c;
   --muted: #6e7884;
   --line: #dde2e8;
-  --ridership: #2a78d6;
+  --ridership: #0e8083;
   --coverage: #eb6834;
   --idle: #cbd2da;
   --rail: #12171d;
-  --ridership-rail: #1a4f94;
+  --ridership-rail: #095457;
   --coverage-rail: #a8401a;
-  --focus: #2a78d6;
+  --focus: #0e8083;
   --display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
   --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
@@ -26,13 +26,13 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #0f1215; --surface: #171b20; --ink: #edf0f3; --ink-2: #b5bdc6; --muted: #8b949e;
-    --line: #2a3139; --ridership: #3987e5; --coverage: #d95926; --idle: #333a42; --rail: #edf0f3; --focus: #3987e5; --ridership-rail: #2a64b8; --coverage-rail: #a9441a;
+    --line: #2a3139; --ridership: #2bb5b0; --coverage: #d95926; --idle: #333a42; --rail: #edf0f3; --focus: #2bb5b0; --ridership-rail: #1b807d; --coverage-rail: #a9441a;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #0f1215; --surface: #171b20; --ink: #edf0f3; --ink-2: #b5bdc6; --muted: #8b949e;
-  --line: #2a3139; --ridership: #3987e5; --coverage: #d95926; --idle: #333a42; --rail: #edf0f3; --focus: #3987e5; --ridership-rail: #2a64b8; --coverage-rail: #a9441a;
+  --line: #2a3139; --ridership: #2bb5b0; --coverage: #d95926; --idle: #333a42; --rail: #edf0f3; --focus: #2bb5b0; --ridership-rail: #1b807d; --coverage-rail: #a9441a;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -49,11 +49,15 @@ p { margin: 0; }
 .lede { max-width: 64ch; color: var(--ink-2); font-size: 1.06rem; }
 .eyebrow { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
-header { display: grid; gap: 10px; }
-.lede em { font-style: italic; color: var(--ink); }
+header { display: grid; gap: 12px; padding-top: 18px; position: relative; }
+header::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--ridership-rail) 0, var(--ridership) 38%, var(--coverage) 62%, var(--coverage-rail) 100%); }
+h1 { background: linear-gradient(90deg, var(--ridership) 0, var(--coverage) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; width: fit-content; max-width: 100%; }
+.k { font-weight: 700; }
+.k.f { color: var(--ridership); }
+.k.c { color: var(--coverage); }
 
 /* Headline split */
-.split { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 20px; display: grid; gap: 14px; }
+.split { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid; border-image: linear-gradient(90deg, var(--ridership), var(--coverage)) 1; border-radius: 0; padding: 20px; display: grid; gap: 14px; }
 .split-figs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .fig { display: grid; gap: 2px; min-width: 0; }
 .fig .big { font-family: var(--display); font-weight: 700; font-size: clamp(2.6rem, 9vw, 4.2rem); line-height: 1; font-variant-numeric: tabular-nums; }
@@ -61,7 +65,9 @@ header { display: grid; gap: 10px; }
 .fig .sub { color: var(--muted); font-size: 0.88rem; }
 .fig.right { text-align: right; justify-items: end; }
 .swatch { width: 12px; height: 12px; border-radius: 2px; display: inline-block; flex: none; }
-.bar { display: flex; height: 22px; gap: 2px; }
+.bar { display: flex; height: 30px; gap: 2px; }
+#pctR { color: var(--ridership); }
+#pctC { color: var(--coverage); }
 .bar > div { height: 100%; transition: flex-basis 0.35s ease; }
 .bar .rl { background: var(--ridership-rail); border-radius: 4px 0 0 4px; }
 .bar .rb { background: var(--ridership); }
@@ -163,7 +169,7 @@ footer { color: var(--muted); font-size: 0.8rem; }
   <header>
     <div class="eyebrow" id="eyebrow">Calgary Transit · fall 2026 schedule</div>
     <h1>Calgary Transit's Two Jobs</h1>
-    <p class="lede">Transit provides two different types of service: <em>Frequency</em> service moves lots of people efficiently, and drives ridership. <em>Coverage</em> service ensures that everyone in Calgary is near a stop. Even though these different services have different goals, right now <em>we judge them the same way</em>, usually on productivity.</p>
+    <p class="lede">Transit provides two different types of service: <strong class="k f">Frequency</strong> service moves lots of people efficiently, and drives ridership. <strong class="k c">Coverage</strong> service ensures that everyone in Calgary is near a stop. Even though these different services have different goals, right now <strong>we judge them the same way</strong>, usually on productivity.</p>
     <p class="lede">Right now, our city policies on transit and land use mean that we continue to drift more and more towards coverage-based service. Adding new subdivisions on the edge of the city and not funding our Primary Transit Network properly are two ways that this shift happens.</p>
     <p class="lede">There is no right or wrong balance of coverage and frequent service, but Calgarians and Council have not been asked how they prefer to balance things. In this page, we explore how that balance works, and how it has changed over time.</p>
   </header>
