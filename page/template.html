@@ -231,6 +231,9 @@ th { border-bottom: 2px solid var(--ink); }
 .opt.freq h3 { color: var(--ridership); }
 .opt h4 { margin: 8px 0 0; font-family: var(--mono); font-size: 0.74rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 .opt a { color: inherit; text-underline-offset: 2px; }
+.opt .quote { margin: 0; font-style: italic; color: var(--ink-2); }
+.opt .quote span { font-style: normal; font-size: 0.85rem; color: var(--muted); }
+.opt .quote span::before { content: "\2014\00a0"; }
 .opt ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; }
 .choices-note { font-family: var(--display); font-weight: 600; font-size: 1.35rem; }
 .ask { --ask-bg: #12171d; background: var(--ask-bg); color: #fffdf8; border: 2px solid var(--ask-bg); padding: 24px 22px 26px; display: grid; gap: 16px; }
@@ -378,7 +381,6 @@ th { border-bottom: 2px solid var(--ink); }
         <ul>
           <li>Extend routes into new communities as they open.</li>
           <li>Keep low-use local routes running everywhere they run today.</li>
-          <li>Add evening and weekend hours to existing local routes.</li>
           <li>Place stops closer together, so everyone is nearer to one.</li>
         </ul>
         <h4>What follows</h4>
@@ -393,10 +395,12 @@ th { border-bottom: 2px solid var(--ink); }
       </article>
       <article class="opt freq">
         <h3>Lean toward frequency</h3>
+        <p class="quote">&ldquo;Frequency is freedom.&rdquo; <span>Jarrett Walker</span></p>
         <h4>What we could do</h4>
         <ul>
           <li>Fund the Primary Transit Network: every 10 minutes or better, all day, every day.</li>
           <li>Pay for it by reshaping the lowest-use local routes, or by directing growth in the transit budget to it.</li>
+          <li>Run frequent routes later into the evening and on weekends, so people can count on getting home.</li>
           <li>Consolidate stops on frequent routes, so buses spend less time stopping and the same hours can run more often.</li>
           <li>Ask for frequent service along the corridors where new housing is approved.</li>
         </ul>
