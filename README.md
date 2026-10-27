@@ -2,7 +2,7 @@
 
 An interactive explorer that sorts Calgary Transit's published bus and CTrain schedules into two jobs: a frequent network (judged on ridership) and a coverage network (judged on who it reaches). Fall 2016, 2019 and 2026 schedules.
 
-Open `dist/index.html` in a browser. Rebuild with `./run_all.sh` (needs unzip, python3, pandas, numpy, shapely>=2).
+Open `docs/index.html` in a browser. Rebuild with `./run_all.sh` (needs unzip, python3, pandas, numpy, shapely>=2).
 
 ## Data and attribution
 
