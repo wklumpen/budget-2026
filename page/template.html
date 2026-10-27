@@ -178,12 +178,12 @@ footer { color: var(--muted); font-size: 0.8rem; }
     <div class="eyebrow" id="split-eyebrow">Weekly service hours, bus and CTrain</div>
     <div class="split-figs">
       <div class="fig">
-        <span class="lbl"><span class="swatch" style="background:var(--ridership)"></span>Ridership job</span>
+        <span class="lbl"><span class="swatch" style="background:var(--ridership)"></span>Frequency</span>
         <span class="big" id="pctR">–</span>
         <span class="sub num" id="hrsR">–</span>
       </div>
       <div class="fig right">
-        <span class="lbl">Coverage job<span class="swatch" style="background:var(--coverage)"></span></span>
+        <span class="lbl">Coverage<span class="swatch" style="background:var(--coverage)"></span></span>
         <span class="big" id="pctC">–</span>
         <span class="sub num" id="hrsC">–</span>
       </div>
@@ -200,7 +200,7 @@ footer { color: var(--muted); font-size: 0.8rem; }
     <div class="ctl">
       <label for="thr">Counts as frequent: every <span class="val" id="thr-val">10</span> min or better</label>
       <input type="range" id="thr" min="5" max="30" step="5" value="10">
-      <div class="ticks"><span>5</span><span>10 · PTN</span><span>15</span><span>20</span><span>25</span><span>30</span></div>
+      <div class="ticks"><span>5</span><span>10</span><span>15</span><span>20</span><span>25</span><span>30</span></div>
     </div>
     <div class="ctl">
       <span class="ctl-l">Fall schedule</span>
@@ -238,8 +238,8 @@ footer { color: var(--muted); font-size: 0.8rem; }
         <div class="tip" id="maptip" hidden></div>
       </div>
       <div class="legend">
-        <span><span class="lg-line" style="height:4px;background:var(--ridership)"></span>Ridership job</span>
-        <span><span class="lg-line" style="height:2px;background:var(--coverage)"></span>Coverage job</span>
+        <span><span class="lg-line" style="height:4px;background:var(--ridership)"></span>Frequency</span>
+        <span><span class="lg-line" style="height:2px;background:var(--coverage)"></span>Coverage</span>
         <span><span class="lg-line" style="height:2px;background:var(--idle)"></span>Not running this hour</span>
         <span><span class="lg-line" style="height:5px;background:var(--ridership-rail)"></span><span class="lg-line" style="height:5px;background:var(--coverage-rail);margin-left:-4px"></span>CTrain, by job</span>
       </div>
@@ -258,7 +258,7 @@ footer { color: var(--muted); font-size: 0.8rem; }
       <section class="panel" aria-label="Sensitivity to threshold">
         <div class="panel-head">
           <h2>Where you draw the line</h2>
-          <p>Ridership share of weekly hours</p>
+          <p>Frequency share of weekly hours</p>
         </div>
         <div class="chart-wrap" id="sens-wrap"><svg id="sens" width="100%"></svg><div class="tip" id="senstip" hidden></div></div>
         <p class="split-note" id="sens-note"></p>
@@ -296,7 +296,7 @@ footer { color: var(--muted); font-size: 0.8rem; }
     </div>
     <div class="tbl-wrap">
       <table>
-        <thead><tr><th>Route</th><th>Name</th><th class="r">Weekly bus-equiv. hrs</th><th>Weekday by hour</th><th class="r">Ridership share</th><th>Job</th><th>Override</th></tr></thead>
+        <thead><tr><th>Route</th><th>Name</th><th class="r">Weekly bus-equiv. hrs</th><th>Weekday by hour</th><th class="r">Frequency share</th><th>Type</th><th>Override</th></tr></thead>
         <tbody id="rows"></tbody>
       </table>
     </div>
@@ -306,11 +306,11 @@ footer { color: var(--muted); font-size: 0.8rem; }
     <h2>How this is built</h2>
     <ul>
       <li><strong>Hours.</strong> Revenue hours are each trip's first-to-last-stop time from the published schedule, split across clock hours. A typical week is four Monday–Thursday days, a Friday, a Saturday and a Sunday. The two one-off October weekend services are left out.</li>
-      <li><strong>Frequency.</strong> For each route and hour, trips starting per direction are averaged over that hour and its neighbours, then averaged across the two directions. An hour counts toward the ridership job when that rate meets the threshold. A route can do both jobs in one day: frequent at noon and coverage at 10 pm.</li>
+      <li><strong>Frequency.</strong> For each route and hour, trips starting per direction are averaged over that hour and its neighbours, then averaged across the two directions. An hour counts toward frequency service when that rate meets the threshold. A route can provide both types in one day: frequent at noon and coverage at 10 pm.</li>
       <li><strong>Routes, not corridors.</strong> Two routes sharing a street each count separately, so a corridor served every 10 minutes by two 20-minute routes shows as coverage. Use the overrides where you know a route is part of a combined frequent corridor.</li>
-      <li><strong>Deadhead.</strong> All service carries an assumed 10% deadhead on top of revenue hours. Because the rate is the same for both jobs, it changes the totals but not the split. In practice coverage routes probably carry more, since they often run farther from garages with shorter spans, so the coverage share here is if anything a little low.</li>
+      <li><strong>Deadhead.</strong> All service carries an assumed 10% deadhead on top of revenue hours. Because the rate is the same for both types, it changes the totals but not the split. In practice coverage routes probably carry more, since they often run farther from garages with shorter spans, so the coverage share here is if anything a little low.</li>
       <li><strong>CTrain.</strong> CTrain is classified hour by hour with the same frequency rule, and counted in the split. A CTrain hour is a train-hour, which costs more to run and carries far more people than a bus hour, so the operating factor sets how many bus hours one train-hour is worth. Available Calgary figures put it between 2 and 3, so the default is 2.5. It is shown in a darker shade so its share stays visible.</li>
-      <li><strong>What is left out.</strong> School specials (routes 600–899) serve a third job and are excluded from the split. Ridership, revenue and cost by route are not public, so this measures what the system puts in, not what it gets back.</li>
+      <li><strong>What is left out.</strong> School specials (routes 600–899) serve a third purpose and are excluded from the split. Ridership, revenue and cost by route are not public, so this measures what the system puts in, not what it gets back.</li>
       <li><strong>Not the Primary Transit Network.</strong> This uses frequency, not the City's PTN corridor designation. The 10-minute mark on the slider is the PTN service standard for comparison.</li>
     </ul>
   </section>
@@ -444,7 +444,7 @@ function renderYears() {
     g += `<text x="${m.l + (x.T / max) * bw - 6}" y="${y0 + rowH / 2 + 4}" text-anchor="end" style="fill:#fff;font-weight:500">${pct(x.C / x.T)} · ${fmt(x.C)} hrs</text>`;
     g += `<line x1="${m.l + rw}" x2="${m.l + rw}" y1="${y0}" y2="${y0 + rowH}" stroke="var(--surface)" stroke-width="2"/>`;
   });
-  svg.innerHTML = g + `<text x="${m.l}" y="${h - 6}">Frequent (ridership job) on the left, coverage on the right. Bar length = weekly bus-equivalent hours.</text>`;
+  svg.innerHTML = g + `<text x="${m.l}" y="${h - 6}">Frequency on the left, coverage on the right. Bar length = weekly bus-equivalent hours.</text>`;
   document.getElementById("yr-label").textContent = `Weekly service hours, every ${state.thr} min or better`;
   const a = S[0], b = S[S.length - 1], d = (k) => Math.round((b[k] / a[k] - 1) * 100);
   document.getElementById("yr-note").textContent =
@@ -460,7 +460,7 @@ function renderSplit() {
   document.getElementById("hrsC").textContent = `${fmt(w.Cb)} bus + ${fmt(w.Cl)} CTrain hrs / week`;
   for (const k of ["Rl", "Rb", "Cb", "Cl"]) document.getElementById("bar" + k).style.flex = `${w[k] / T} 1 0`;
   document.getElementById("splitbar").setAttribute("aria-label",
-    `Ridership ${pct(w.R / T)} (bus ${pct(w.Rb / T)}, CTrain ${pct(w.Rl / T)}); coverage ${pct(w.C / T)} (bus ${pct(w.Cb / T)}, CTrain ${pct(w.Cl / T)})`);
+    `Frequency ${pct(w.R / T)} (bus ${pct(w.Rb / T)}, CTrain ${pct(w.Rl / T)}); coverage ${pct(w.C / T)} (bus ${pct(w.Cb / T)}, CTrain ${pct(w.Cl / T)})`);
   const schH = school.reduce((s, r) => s + r.wkh, 0);
   document.getElementById("split-note").textContent =
     `Of ${fmt(T)} weekly service hours, ${pct(w.R / T)} run every ${state.thr} minutes or better. CTrain makes up ${pct((w.Rl + w.Cl) / T)} of the total at ${state.lrt.toFixed(1)}× bus hours. All figures include an assumed 10% deadhead. School specials (${fmt(schH * (1 + DH))} hours) are not counted.`;
@@ -545,7 +545,7 @@ canvas.addEventListener("pointermove", e => {
   canvas.style.cursor = "pointer";
   const c = routeClassAt(r, state.dt, state.hour);
   const tph = r.tph[state.dt][state.hour];
-  const what = c === "idle" ? "Not running" : (c === "R" ? "Ridership job" : "Coverage job");
+  const what = c === "idle" ? "Not running" : (c === "R" ? "Frequency" : "Coverage");
   maptip.innerHTML = `<b>${r.n} ${r.name}</b><br>${what} at ${hourLabel(state.hour)}${c !== "idle" ? ` · about every ${Math.round(60 / tph)} min` : ""}`;
   maptip.hidden = false;
   const tw = maptip.offsetWidth;
@@ -578,7 +578,7 @@ function renderDetail() {
   }
   const st = routeStats(r);
   el.innerHTML = `<h3>${r.n} ${r.name}</h3>
-    <div class="row"><span class="num">${fmt(r.wkh)} ${isRail ? "train-hrs" : "revenue hrs"} / week</span><span>·</span><span>${pct(st.share)} of its hours in the ridership job</span></div>
+    <div class="row"><span class="num">${fmt(r.wkh)} ${isRail ? "train-hrs" : "revenue hrs"} / week</span><span>·</span><span>${pct(st.share)} of its hours as frequency service</span></div>
     <div class="eyebrow" style="text-transform:none;letter-spacing:0">${DT_LABEL[state.dt]}, hour by hour</div>
     <div class="strip">${cells.join("")}</div>
     <div class="strip-axis"><span>05:00</span><span>15:00</span><span>01:00</span></div>`;
@@ -626,7 +626,7 @@ function renderTOD() {
   const idxAt = e => { const b = svg.getBoundingClientRect(); const x = (e.clientX - b.left) * (w / b.width); return Math.max(0, Math.min(hours.length - 1, Math.round((x - m.l) / (w - m.l - m.r) * (hours.length - 1)))); };
   hit.addEventListener("pointermove", e => {
     const i = idxAt(e); cx.setAttribute("x1", X(i)); cx.setAttribute("x2", X(i)); cx.setAttribute("visibility", "visible");
-    tip.innerHTML = `<b>${hourLabel(hours[i])}</b><br>Ridership ${fmt(R[i])} hrs <span style="opacity:.75">(CTrain ${fmt(L.Rl[i])})</span><br>Coverage ${fmt(T[i] - R[i])} hrs <span style="opacity:.75">(CTrain ${fmt(L.Cl[i])})</span>`;
+    tip.innerHTML = `<b>${hourLabel(hours[i])}</b><br>Frequency ${fmt(R[i])} hrs <span style="opacity:.75">(CTrain ${fmt(L.Rl[i])})</span><br>Coverage ${fmt(T[i] - R[i])} hrs <span style="opacity:.75">(CTrain ${fmt(L.Cl[i])})</span>`;
     tip.hidden = false;
     const b = svg.getBoundingClientRect(); const px = X(i) * (b.width / w);
     tip.style.left = Math.min(px + 10, b.width - tip.offsetWidth - 4) + "px"; tip.style.top = "8px";
@@ -688,7 +688,7 @@ function renderTable() {
     const isRail = r.mode === "ctrain";
     const cR = css(isRail ? "--ridership-rail" : "--ridership"), cC = css(isRail ? "--coverage-rail" : "--coverage");
     const st = routeStats(r);
-    const job = st.share >= 0.67 ? ["R", "Ridership"] : st.share <= 0.33 ? ["C", "Coverage"] : ["M", "Both"];
+    const job = st.share >= 0.67 ? ["R", "Frequency"] : st.share <= 0.33 ? ["C", "Coverage"] : ["M", "Both"];
     let mini = "";
     for (let h = 6; h < 24; h++) { const c = routeClassAt(r, "mt", h); mini += `<div style="flex:1;background:${c === "R" ? cR : c === "C" ? cC : cI}"></div>`; }
     const o = state.over[r.id] || "auto";
@@ -699,7 +699,7 @@ function renderTable() {
       <td><span class="pill ${job[0]}">${job[1]}</span></td>
       <td><select data-id="${r.id}" aria-label="Override route ${r.n}">
         <option value="auto"${o === "auto" ? " selected" : ""}>By frequency</option>
-        <option value="R"${o === "R" ? " selected" : ""}>Ridership</option>
+        <option value="R"${o === "R" ? " selected" : ""}>Frequency</option>
         <option value="C"${o === "C" ? " selected" : ""}>Coverage</option></select></td></tr>`;
   }).join("");
   const sa = document.getElementById("showall");
