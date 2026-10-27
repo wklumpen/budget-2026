@@ -65,8 +65,6 @@ header::before { content: ""; position: absolute; top: 0; left: 0; right: 0; hei
 .fig.right { text-align: right; justify-items: end; }
 .swatch { width: 12px; height: 12px; border-radius: 2px; display: inline-block; flex: none; }
 .bar { display: flex; height: 30px; gap: 2px; }
-#pctR { color: var(--ridership); }
-#pctC { color: var(--coverage); }
 .bar > div { height: 100%; transition: flex-basis 0.35s ease; }
 .bar .rl { background: var(--ridership-rail); border-radius: 4px 0 0 4px; }
 .bar .rb { background: var(--ridership); }
@@ -163,9 +161,9 @@ footer { color: var(--muted); font-size: 0.8rem; }
 }
 @media (prefers-reduced-motion: reduce) { .bar > div { transition: none; } }
 /* Signage theme: warm paper, hard rules, square corners, flat colour blocks */
-:root { --bg: #f2eee4; --surface: #fffdf8; --line: #d6cfbf; --on-r: #fff; --on-c: #12171d; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --on-r: #0f1215; --on-c: #0f1215; } }
-:root[data-theme="dark"] { --on-r: #0f1215; --on-c: #0f1215; }
+:root { --bg: #f2eee4; --surface: #fffdf8; --line: #d6cfbf; --on-r: #fff; --on-c: #fff; --block-c: #c94d1b; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --on-r: #0f1215; --on-c: #0f1215; --block-c: var(--coverage); } }
+:root[data-theme="dark"] { --on-r: #0f1215; --on-c: #0f1215; --block-c: var(--coverage); }
 header { padding-top: 26px; gap: 14px; }
 header::before { height: 14px; border-radius: 0; }
 .eyebrow { font-weight: 500; }
@@ -179,11 +177,12 @@ header .lede:first-of-type { font-size: 1.3rem; font-weight: 700; line-height: 1
 .split-figs { gap: 0; }
 .split .fig { padding: 18px 20px 16px; }
 .split .fig:first-child { background: var(--ridership); color: var(--on-r); }
-.split .fig.right { background: var(--coverage); color: var(--on-c); }
+.split .fig.right { background: var(--block-c); color: var(--on-c); }
 .split .fig .big { font-size: clamp(4rem, 15vw, 8rem); color: inherit; }
 .split .fig .lbl { text-transform: uppercase; letter-spacing: 0.08em; font-size: 1.05rem; }
 .split .fig .lbl .swatch { display: none; }
-.split .fig .sub { color: inherit; opacity: .9; }
+.split .fig .sub { color: inherit; opacity: 1; }
+.split .fig .lbl { font-size: 1.2rem; }
 .split .bar { margin: 16px 20px 0; }
 .split .bar-legend, .split .split-note { margin: 12px 20px 0; }
 .split .split-note { margin-bottom: 18px; }
@@ -465,27 +464,37 @@ function splitFor(y, thr) {
   return o;
 }
 function renderYears() {
-  const svg = document.getElementById("yr"), w = document.getElementById("yr-wrap").clientWidth, h = 70 + YEARS.length * 46 - 46 + 20, m = { l: 44, r: 8, t: 8, b: 22 };
-  svg.setAttribute("viewBox", `0 0 ${w} ${h}`); svg.setAttribute("height", h);
+  const svg = document.getElementById("yr"), w = document.getElementById("yr-wrap").clientWidth;
   const S = YEARS.map(y => splitFor(y, state.thr));
-  const max = Math.max(...S.map(x => x.T)), bw = w - m.l - m.r, rowH = 34, gap = 12;
-  let g = "";
+  const m = { l: 44, r: 4, t: 26, b: 6 }, bh = 36, pitch = 62, h = m.t + YEARS.length * pitch + m.b;
+  svg.setAttribute("viewBox", `0 0 ${w} ${h}`); svg.setAttribute("height", h);
+  const bw = w - m.l - m.r;
+  // one scale for both sides, sized so the widest frequency and coverage bars still leave a gap between them
+  const sc = bw * 0.9 / (Math.max(...S.map(x => x.R)) + Math.max(...S.map(x => x.C)));
+  const big = "font-family:var(--display);font-weight:700;font-size:22px;";
+  let g = `<text x="${m.l}" y="14" style="font-weight:700;letter-spacing:.08em;fill:var(--ridership)">FREQUENCY</text>` +
+          `<text x="${w - m.r}" y="14" text-anchor="end" style="font-weight:700;letter-spacing:.08em;fill:var(--coverage)">COVERAGE</text>`;
   S.forEach((x, i) => {
-    const y0 = m.t + i * (rowH + gap); let cx = m.l;
-    g += `<text x="${m.l - 8}" y="${y0 + rowH / 2 + 4}" text-anchor="end">${YEARS[i]}</text>`;
-    for (const [k, c] of [["Rl", "--ridership-rail"], ["Rb", "--ridership"], ["Cb", "--coverage"], ["Cl", "--coverage-rail"]]) {
-      const ww = x[k] / max * bw; g += `<rect x="${cx}" y="${y0}" width="${Math.max(ww, 0)}" height="${rowH}" fill="var(${c})"/>`; cx += ww;
-    }
-    const rw = x.R / max * bw;
-    g += `<text x="${m.l + 6}" y="${y0 + rowH / 2 + 4}" style="fill:#fff;font-weight:500">${pct(x.R / x.T)} · ${fmt(x.R)} hrs</text>`;
-    g += `<text x="${m.l + (x.T / max) * bw - 6}" y="${y0 + rowH / 2 + 4}" text-anchor="end" style="fill:#fff;font-weight:500">${pct(x.C / x.T)} · ${fmt(x.C)} hrs</text>`;
-    g += `<line x1="${m.l + rw}" x2="${m.l + rw}" y1="${y0}" y2="${y0 + rowH}" stroke="var(--surface)" stroke-width="2"/>`;
+    const y0 = m.t + i * pitch;
+    g += `<text x="${m.l - 8}" y="${y0 + bh / 2 + 4}" text-anchor="end">${YEARS[i]}</text>`;
+    // frequency: left aligned, CTrain (dark) then bus
+    let cx = m.l;
+    for (const [k, c] of [["Rl", "--ridership-rail"], ["Rb", "--ridership"]]) { const ww = x[k] * sc; g += `<rect x="${cx}" y="${y0}" width="${ww}" height="${bh}" fill="var(${c})"/>`; cx += ww; }
+    // coverage: right aligned, bus then CTrain (dark) at the edge
+    let ex = w - m.r; const cw = x.C * sc;
+    for (const [k, c] of [["Cl", "--coverage-rail"], ["Cb", "--coverage"]]) { const ww = x[k] * sc; ex -= ww; g += `<rect x="${ex}" y="${y0}" width="${ww}" height="${bh}" fill="var(${c})"/>`; }
+    const fw = x.R * sc, tw = 54;
+    const label = (txt, wid, left, color) => wid >= tw
+      ? `<text ${left ? `x="${m.l + 8}"` : `x="${w - m.r - 8}" text-anchor="end"`} y="${y0 + bh / 2 + 8}" style="${big}fill:#fff">${txt}</text>`
+      : `<text ${left ? `x="${m.l + wid + 8}"` : `x="${w - m.r - wid - 8}" text-anchor="end"`} y="${y0 + bh / 2 + 8}" style="${big}fill:var(${color})">${txt}</text>`;
+    g += label(pct(x.R / x.T), fw, true, "--ridership") + label(pct(x.C / x.T), cw, false, "--coverage");
+    g += `<text x="${m.l}" y="${y0 + bh + 14}">${fmt(x.R)} hrs/week</text><text x="${w - m.r}" y="${y0 + bh + 14}" text-anchor="end">${fmt(x.C)} hrs/week</text>`;
   });
-  svg.innerHTML = g + `<text x="${m.l}" y="${h - 6}">Frequency on the left, coverage on the right. Bar length = weekly bus-equivalent hours.</text>`;
-  document.getElementById("yr-label").textContent = `Weekly service hours, every ${state.thr} min or better`;
-  const a = S[0], b = S[S.length - 1], d = (k) => Math.round((b[k] / a[k] - 1) * 100);
+  svg.innerHTML = g;
+  document.getElementById("yr-label").textContent = `Share of weekly service hours, every ${state.thr} min or better`;
+  const a = S[0], b = S[S.length - 1], d = k => { const v = Math.round((b[k] / a[k] - 1) * 100); return (v >= 0 ? "+" : "") + v + "%"; };
   document.getElementById("yr-note").textContent =
-    `${YEARS[0]} to ${YEARS[YEARS.length - 1]}: frequent hours ${d("R") >= 0 ? "+" : ""}${d("R")}%, coverage hours ${d("C") >= 0 ? "+" : ""}${d("C")}%, total ${Math.round((b.T / a.T - 1) * 100) >= 0 ? "+" : ""}${Math.round((b.T / a.T - 1) * 100)}%. Same method, reference weekdays and CTrain factor in every year. Route restructures inflate route-level changes; see the stop-level measures below. This shows where the hours went, not where the people are, and population is not shown.`;
+    `${YEARS[0]} to ${YEARS[YEARS.length - 1]}: frequency hours ${d("R")}, coverage hours ${d("C")}, total ${d("T")}. Bars share one scale. Darker shade is CTrain, counted at ${state.lrt.toFixed(1)}× bus hours. Same method and reference weekdays in every year. Route restructures inflate route-level changes; see the stop-level measures below. This shows where the hours went, not where the people are.`;
 }
 
 // ---------- Headline split ----------
