@@ -570,8 +570,8 @@ function renderYears() {
   const m = { l: 44, r: 4, t: 26, b: 6 }, bh = 36, pitch = 62, h = m.t + YEARS.length * pitch + m.b;
   svg.setAttribute("viewBox", `0 0 ${w} ${h}`); svg.setAttribute("height", h);
   const bw = w - m.l - m.r;
-  // one scale for both sides, sized so the widest frequency and coverage bars still leave a gap between them
-  const sc = bw * 0.9 / (Math.max(...S.map(x => x.R)) + Math.max(...S.map(x => x.C)));
+  // one scale for every row, fitted to the year with the most hours; its gap is a fixed 16px, the others' gaps are the difference in totals
+  const sc = (bw - 16) / Math.max(...S.map(x => x.T));
   const big = "font-family:var(--display);font-weight:700;font-size:22px;";
   let g = `<text x="${m.l}" y="14" style="font-weight:700;letter-spacing:.08em;fill:var(--ridership)">FREQUENCY</text>` +
           `<text x="${w - m.r}" y="14" text-anchor="end" style="font-weight:700;letter-spacing:.08em;fill:var(--coverage)">COVERAGE</text>`;
@@ -595,7 +595,7 @@ function renderYears() {
   document.getElementById("yr-label").textContent = `Share of weekly service hours, every ${state.thr} min or better`;
   const a = S[0], b = S[S.length - 1], d = k => { const v = Math.round((b[k] / a[k] - 1) * 100); return (v >= 0 ? "+" : "") + v + "%"; };
   document.getElementById("yr-note").textContent =
-    `${YEARS[0]} to ${YEARS[YEARS.length - 1]}: frequency hours ${d("R")}, coverage hours ${d("C")}, total ${d("T")}. Bars share one scale. Darker shade is CTrain, counted at ${state.lrt.toFixed(1)}× bus hours. Same method and reference weekdays in every year. Route restructures inflate route-level changes; see the stop-level measures below. This shows where the hours went, not where the people are.`;
+    `${YEARS[0]} to ${YEARS[YEARS.length - 1]}: frequency hours ${d("R")}, coverage hours ${d("C")}, total ${d("T")}. Bars share one scale, so the gap in the middle is how much less service a year had than the largest year. Darker shade is CTrain, counted at ${state.lrt.toFixed(1)}× bus hours. Same method and reference weekdays in every year. Route restructures inflate route-level changes; see the stop-level measures below. This shows where the hours went, not where the people are.`;
 }
 
 // ---------- Headline split ----------
