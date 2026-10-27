@@ -359,7 +359,7 @@ th { border-bottom: 2px solid var(--ink); }
   <section class="panel" aria-label="Ten years of frequent service">
     <div class="panel-head">
       <h2>Frequent service has not kept pace with coverage</h2>
-      <p>Fall schedules, weekday, 2016 · 2019 · 2026</p>
+      <p id="trend-label">Fall schedules, weekday</p>
     </div>
     <div class="trend" id="trend"></div>
     <p class="split-note">Most of the drop in frequent service happened between 2016 and 2019, before COVID. Schedules cannot say why. Route restructures (Route 3 split, Circle and BRT North replaced, MAX lines) and stop consolidation distort route-level comparisons, so the trend uses stop-level and area measures. This is service supplied, not ridership: the City does not publish ridership by route.</p>
@@ -532,6 +532,7 @@ const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).
 // ---------- Trend across fall schedules (stop-level and area measures, from scripts/trend_json.py; follow the threshold slider) ----------
 const TREND = __TREND__;
 function renderTrend() {
+  document.getElementById("trend-label").textContent = `Fall schedules, weekday, every ${state.thr} min or better`;
   const T = TREND[state.thr], thr = state.thr, ys = YEARS.filter(y => T[y]);
   const S = ys.map(y => splitFor(y, thr));
   const cards = [
