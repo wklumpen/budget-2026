@@ -529,25 +529,27 @@ const hourLabel = h => { const hh = h % 24; return (hh < 10 ? "0" : "") + hh + "
 const hourWord = h => { const hh = h % 24; if (hh === 12) return "noon"; if (hh === 0) return "midnight"; return hh < 12 ? hh + " am" : (hh - 12) + " pm"; };
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 
-// ---------- Trend across fall schedules ----------
-// Numbers from results/stop_level.txt, coverage_area.txt and route_level.txt (rerun run_all.sh to refresh).
-const TREND = [
-  { t: "Midday stop-visits at 10 min or better", sub: "Share of all stop-visits, 10:00 to 15:00", unit: "%", c: "--ridership",
-    v: { 2016: 31, 2019: 24, 2026: 25 } },
-  { t: "Area with 10-minute midday service", sub: "km² within 800 m of CTrain / 400 m of a bus stop. Covered area: 463 → 485 → 509 km²", unit: " km²", c: "--ridership",
-    v: { 2016: 128, 2019: 119, 2026: 124 }, ref: { 2016: 463, 2019: 485, 2026: 509 }, refLabel: "total covered" },
-  { t: "Bus hours on routes at 10 min or better", sub: "Weekday bus revenue hours on routes running every 10 minutes or better", unit: " hrs", c: "--ridership",
-    v: { 2016: 4665, 2019: 1738, 2026: 1592 } },
-];
+// ---------- Trend across fall schedules (stop-level and area measures, from scripts/trend_json.py; follow the threshold slider) ----------
+const TREND = __TREND__;
 function renderTrend() {
-  document.getElementById("trend").innerHTML = TREND.map(t => {
-    const max = Math.max(...Object.values(t.ref || t.v));
-    const rows = Object.keys(t.v).map(y => {
-      const w = x => (x / max * 100).toFixed(1);
+  const T = TREND[state.thr], thr = state.thr, ys = YEARS.filter(y => T[y]);
+  const S = ys.map(y => splitFor(y, thr));
+  const cards = [
+    { t: `Midday stop-visits every ${thr} min or better`, sub: "Share of all stop-visits at stops with weekday service, 10:00 to 15:00",
+      unit: "%", v: ys.map(y => T[y].visits), max: 100 },
+    { t: `Area with ${thr}-minute midday service`, sub: "km² within 800 m of CTrain / 400 m of a bus stop. Grey bar is the whole covered area",
+      unit: " km²", v: ys.map(y => T[y].area), ref: ys.map(y => TREND.covered[y]) },
+    { t: `Bus hours on routes every ${thr} min or better`, sub: "Weekly bus revenue hours, hours when the route meets the threshold",
+      unit: " hrs", v: S.map(x => x.Rb / (1 + DH)) },
+  ];
+  document.getElementById("trend").innerHTML = cards.map(t => {
+    const max = t.max || Math.max(...(t.ref || t.v));
+    const rows = ys.map((y, i) => {
+      const w = x => (x / max * 100).toFixed(1), val = t.unit === "%" ? t.v[i].toFixed(0) : Math.round(t.v[i]).toLocaleString("en-CA");
       return `<div class="trow"><span class="num">${y}</span><span class="tr"><span style="position:relative;flex:1;height:16px;display:block">
-        ${t.ref ? `<span class="fill" style="position:absolute;left:0;width:${w(t.ref[y])}%;background:var(--idle);height:16px"></span>` : ""}
-        <span class="fill" style="position:absolute;left:0;width:${w(t.v[y])}%;background:var(${t.c});height:16px;${y === state.year ? "" : "opacity:.55"}"></span></span>
-        <span class="v">${t.v[y].toLocaleString("en-CA")}${t.unit}</span></span></div>`;
+        ${t.ref ? `<span class="fill" style="position:absolute;left:0;width:${w(t.ref[i])}%;background:var(--idle);height:16px"></span>` : ""}
+        <span class="fill" style="position:absolute;left:0;width:${w(t.v[i])}%;background:var(--ridership);height:16px;${y === state.year ? "" : "opacity:.55"}"></span></span>
+        <span class="v">${val}${t.unit}</span></span></div>`;
     }).join("");
     return `<div class="tcard"><h3>${t.t}</h3><div class="tbars">${rows}</div><p class="sub">${t.sub}</p></div>`;
   }).join("");

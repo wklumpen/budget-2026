@@ -15,7 +15,9 @@ mkdir -p data results docs
   --label "Calgary Transit GTFS, MobilityDatabase mdb-712, published 2026-10-14" \
   --period "Regular service effective 2026-10-13 to 2026-12-20"
 
-"$PY" -I scripts/build_page.py page/template.html docs/index.html 2016=data/data2016.json 2019=data/data2019.json 2026=data/data2026.json
+"$PY" -I scripts/trend_json.py data/trend.json 2016 feeds/2016 20161018 2019 feeds/2019 20191022 2026 feeds/2026 20261103
+
+"$PY" -I scripts/build_page.py page/template.html docs/index.html 2016=data/data2016.json 2019=data/data2019.json 2026=data/data2026.json trend=data/trend.json
 
 "$PY" -I scripts/compare3.py 2016 data/data2016.json 2019 data/data2019.json 2026 data/data2026.json > results/route_level.txt
 "$PY" -I scripts/stoplevel_multi.py "2016 Tue 18 Oct" feeds/2016 20161018 "2019 Tue 22 Oct" feeds/2019 20191022 "2026 Tue 3 Nov" feeds/2026 20261103 > results/stop_level.txt
