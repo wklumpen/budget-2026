@@ -1,0 +1,718 @@
+<title>Calgary Transit's Two Jobs</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column; headline split bar, then a control rail, then map + time-of-day side by side on wide screens, route table, method notes. Signage-condensed display type for figures and headings. */
+:root {
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --ink: #12171d;
+  --ink-2: #47515c;
+  --muted: #6e7884;
+  --line: #dde2e8;
+  --ridership: #2a78d6;
+  --coverage: #eb6834;
+  --idle: #cbd2da;
+  --rail: #12171d;
+  --ridership-rail: #1a4f94;
+  --coverage-rail: #a8401a;
+  --focus: #2a78d6;
+  --display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1215; --surface: #171b20; --ink: #edf0f3; --ink-2: #b5bdc6; --muted: #8b949e;
+    --line: #2a3139; --ridership: #3987e5; --coverage: #d95926; --idle: #333a42; --rail: #edf0f3; --focus: #3987e5; --ridership-rail: #2a64b8; --coverage-rail: #a9441a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1215; --surface: #171b20; --ink: #edf0f3; --ink-2: #b5bdc6; --muted: #8b949e;
+  --line: #2a3139; --ridership: #3987e5; --coverage: #d95926; --idle: #333a42; --rail: #edf0f3; --focus: #3987e5; --ridership-rail: #2a64b8; --coverage-rail: #a9441a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 28px 56px; display: grid; gap: 28px; }
+h1, h2 { font-family: var(--display); font-weight: 700; letter-spacing: 0.01em; line-height: 1.05; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); }
+h2 { font-size: 1.45rem; }
+p { margin: 0; }
+.lede { max-width: 64ch; color: var(--ink-2); font-size: 1.06rem; }
+.eyebrow { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+header { display: grid; gap: 10px; }
+
+/* Headline split */
+.split { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 20px; display: grid; gap: 14px; }
+.split-figs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.fig { display: grid; gap: 2px; min-width: 0; }
+.fig .big { font-family: var(--display); font-weight: 700; font-size: clamp(2.6rem, 9vw, 4.2rem); line-height: 1; font-variant-numeric: tabular-nums; }
+.fig .lbl { font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.fig .sub { color: var(--muted); font-size: 0.88rem; }
+.fig.right { text-align: right; justify-items: end; }
+.swatch { width: 12px; height: 12px; border-radius: 2px; display: inline-block; flex: none; }
+.bar { display: flex; height: 22px; gap: 2px; }
+.bar > div { height: 100%; transition: flex-basis 0.35s ease; }
+.bar .rl { background: var(--ridership-rail); border-radius: 4px 0 0 4px; }
+.bar .rb { background: var(--ridership); }
+.bar .cb { background: var(--coverage); }
+.bar .cl { background: var(--coverage-rail); border-radius: 0 4px 4px 0; }
+.bar-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 0.82rem; color: var(--ink-2); }
+.bar-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.pair { display: inline-flex; gap: 2px; }
+.split-note { color: var(--ink-2); font-size: 0.9rem; max-width: 80ch; }
+
+/* Controls */
+.controls { display: flex; flex-wrap: wrap; gap: 18px 28px; align-items: end; }
+.ctl { display: grid; gap: 6px; min-width: 0; }
+.ctl label, .ctl .ctl-l { font-size: 0.82rem; font-weight: 700; color: var(--ink-2); }
+.ctl .val { font-family: var(--mono); font-weight: 500; color: var(--ink); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--surface); }
+.seg button { font: inherit; font-size: 0.88rem; border: 0; background: transparent; color: var(--ink-2); padding: 6px 12px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+.seg button + button { border-left: 1px solid var(--line); }
+input[type=range] { width: 210px; max-width: 100%; accent-color: var(--ink); }
+.thr-wrap { position: relative; }
+.ticks { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 0.7rem; color: var(--muted); width: 210px; max-width: 100%; }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* Panels */
+.grid2 { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 860px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 16px; display: grid; gap: 12px; min-width: 0; }
+.panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.panel-head p { color: var(--muted); font-size: 0.86rem; }
+.mapbox { position: relative; width: 100%; aspect-ratio: 1 / 1.02; max-width: 100%; }
+#map { width: 100%; height: 100%; display: block; touch-action: pan-y; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 0.84rem; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.lg-line { width: 22px; border-radius: 2px; display: inline-block; }
+.hourbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.hourbar .clock { font-family: var(--display); font-weight: 700; font-size: 1.7rem; min-width: 4.2ch; font-variant-numeric: tabular-nums; }
+.btn { font: inherit; font-size: 0.86rem; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+.btn:hover { border-color: var(--ink-2); }
+#hour { width: 240px; }
+
+.tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--surface); font-size: 0.82rem; line-height: 1.35; padding: 7px 9px; border-radius: 5px; max-width: 230px; z-index: 5; }
+.tip b { font-weight: 700; }
+
+svg text { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+svg .grid line { stroke: var(--line); }
+.chart-wrap { position: relative; }
+
+/* Route detail */
+.detail { border-top: 1px solid var(--line); padding-top: 12px; display: grid; gap: 8px; }
+.detail h3 { margin: 0; font-family: var(--display); font-size: 1.25rem; }
+.detail .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; font-size: 0.88rem; color: var(--ink-2); }
+.strip { display: grid; grid-template-columns: repeat(21, 1fr); gap: 2px; }
+.strip div { height: 14px; border-radius: 2px; }
+.strip-axis { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 0.68rem; color: var(--muted); }
+
+/* Table */
+.tools { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.tools input[type=search] { font: inherit; font-size: 0.9rem; padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); width: 240px; max-width: 100%; }
+.tbl-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.88rem; min-width: 560px; }
+th { text-align: left; font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 700; padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+td.r, th.r { text-align: right; }
+tr.sel td { background: color-mix(in srgb, var(--ridership) 9%, transparent); }
+tbody tr { cursor: pointer; }
+.rtn { font-family: var(--display); font-weight: 700; font-size: 1.05rem; }
+.mini { display: flex; height: 8px; width: 90px; gap: 1px; }
+.mini div { height: 100%; }
+.pill { display: inline-block; font-size: 0.74rem; font-weight: 700; padding: 1px 8px; border-radius: 999px; border: 1px solid; white-space: nowrap; }
+.pill.R { color: var(--ridership); border-color: var(--ridership); }
+.pill.C { color: var(--coverage); border-color: var(--coverage); }
+.pill.M { color: var(--ink-2); border-color: var(--line); }
+select { font: inherit; font-size: 0.82rem; padding: 3px 6px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface); color: var(--ink); }
+
+.trend { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+@media (max-width: 760px) { .trend { grid-template-columns: minmax(0, 1fr); } }
+.tcard { display: grid; gap: 8px; align-content: start; }
+.tcard h3 { margin: 0; font-family: var(--display); font-size: 1.15rem; line-height: 1.15; }
+.tcard .sub { color: var(--muted); font-size: 0.82rem; }
+.tbars { display: grid; gap: 5px; }
+.trow { display: grid; grid-template-columns: 3.2ch 1fr; gap: 8px; align-items: center; font-size: 0.82rem; }
+.trow .tr { display: flex; align-items: center; gap: 8px; }
+.trow .fill { height: 16px; border-radius: 3px; min-width: 2px; }
+.trow .v { font-family: var(--mono); font-size: 0.8rem; color: var(--ink); white-space: nowrap; }
+.notes { display: grid; gap: 10px; max-width: 76ch; color: var(--ink-2); font-size: 0.92rem; }
+.notes h2 { color: var(--ink); }
+.notes ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; }
+.notes strong { color: var(--ink); }
+footer { color: var(--muted); font-size: 0.8rem; }
+@media (max-width: 520px) {
+  .fig .big { font-size: 2.6rem; }
+  .split { padding: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .bar > div { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow" id="eyebrow">Calgary Transit · fall 2026 schedule</div>
+    <h1>Calgary Transit's Two Jobs</h1>
+    <p class="lede">Transit does double duty. Some service is there to carry lots of people, and should be judged on ridership. Some is there so every neighbourhood has a bus, and should be judged on who it reaches. This page sorts the published bus and CTrain schedule into those two jobs by how often each route runs, hour by hour.</p>
+  </header>
+
+  <section class="split" aria-label="Weekly service split">
+    <div class="eyebrow" id="split-eyebrow">Weekly service hours, bus and CTrain</div>
+    <div class="split-figs">
+      <div class="fig">
+        <span class="lbl"><span class="swatch" style="background:var(--ridership)"></span>Ridership job</span>
+        <span class="big" id="pctR">–</span>
+        <span class="sub num" id="hrsR">–</span>
+      </div>
+      <div class="fig right">
+        <span class="lbl">Coverage job<span class="swatch" style="background:var(--coverage)"></span></span>
+        <span class="big" id="pctC">–</span>
+        <span class="sub num" id="hrsC">–</span>
+      </div>
+    </div>
+    <div class="bar" role="img" id="splitbar" aria-label="Split bar"><div class="rl" id="barRl"></div><div class="rb" id="barRb"></div><div class="cb" id="barCb"></div><div class="cl" id="barCl"></div></div>
+    <div class="bar-legend">
+      <span><span class="pair"><span class="swatch" style="background:var(--ridership)"></span><span class="swatch" style="background:var(--coverage)"></span></span>Bus</span>
+      <span><span class="pair"><span class="swatch" style="background:var(--ridership-rail)"></span><span class="swatch" style="background:var(--coverage-rail)"></span></span>CTrain, at <span class="num" id="lrt-legend">2.5</span>× bus hours</span>
+    </div>
+    <p class="split-note" id="split-note"></p>
+  </section>
+
+  <section class="controls" aria-label="Settings">
+    <div class="ctl">
+      <label for="thr">Counts as frequent: every <span class="val" id="thr-val">10</span> min or better</label>
+      <input type="range" id="thr" min="5" max="30" step="1" value="10">
+      <div class="ticks"><span>5</span><span>10 · PTN</span><span>15</span><span>20</span><span>25</span><span>30</span></div>
+    </div>
+    <div class="ctl">
+      <span class="ctl-l">Fall schedule</span>
+      <div class="seg" role="group" aria-label="Schedule year" id="years"></div>
+    </div>
+    <div class="ctl">
+      <span class="ctl-l">Map and chart show</span>
+      <div class="seg" role="group" aria-label="Day type" id="days">
+        <button type="button" data-d="mt" aria-pressed="true">Weekday</button>
+        <button type="button" data-d="sa" aria-pressed="false">Saturday</button>
+        <button type="button" data-d="su" aria-pressed="false">Sunday</button>
+      </div>
+    </div>
+    <div class="ctl">
+      <label for="lrt">One CTrain hour counts as <span class="val" id="lrt-val">2.5</span> bus hours</label>
+      <input type="range" id="lrt" min="1" max="3" step="0.1" value="2.5">
+      <div class="ticks"><span>1×</span><span>2×</span><span>3×</span></div>
+      <span class="sub" style="font-size:0.78rem;color:var(--muted)">Calgary estimates fall between 2× and 3×</span>
+    </div>
+  </section>
+
+  <div class="grid2">
+    <section class="panel" aria-label="Network map">
+      <div class="panel-head">
+        <h2>The network at <span id="clock-h">noon</span></h2>
+        <p>Tap or hover a route</p>
+      </div>
+      <div class="hourbar">
+        <span class="clock" id="clock">12:00</span>
+        <input type="range" id="hour" min="5" max="24" step="1" value="12" aria-label="Hour of day">
+        <button type="button" class="btn" id="play">Play the day</button>
+      </div>
+      <div class="mapbox" id="mapbox">
+        <canvas id="map" aria-label="Map of bus routes coloured by job at the selected hour"></canvas>
+        <div class="tip" id="maptip" hidden></div>
+      </div>
+      <div class="legend">
+        <span><span class="lg-line" style="height:4px;background:var(--ridership)"></span>Ridership job</span>
+        <span><span class="lg-line" style="height:2px;background:var(--coverage)"></span>Coverage job</span>
+        <span><span class="lg-line" style="height:2px;background:var(--idle)"></span>Not running this hour</span>
+        <span><span class="lg-line" style="height:5px;background:var(--ridership-rail)"></span><span class="lg-line" style="height:5px;background:var(--coverage-rail);margin-left:-4px"></span>CTrain, by job</span>
+      </div>
+      <div class="detail" id="detail" hidden></div>
+    </section>
+
+    <div style="display:grid;gap:20px;min-width:0">
+      <section class="panel" aria-label="Service through the day">
+        <div class="panel-head">
+          <h2>Through the day</h2>
+          <p id="day-label">Weekday service hours by clock hour</p>
+        </div>
+        <div class="chart-wrap" id="tod-wrap"><svg id="tod" width="100%"></svg><div class="tip" id="todtip" hidden></div></div>
+        <p class="eyebrow" style="text-transform:none;letter-spacing:0">Tap the chart to move the map to that hour.</p>
+      </section>
+      <section class="panel" aria-label="Sensitivity to threshold">
+        <div class="panel-head">
+          <h2>Where you draw the line</h2>
+          <p>Ridership share of weekly hours</p>
+        </div>
+        <div class="chart-wrap" id="sens-wrap"><svg id="sens" width="100%"></svg><div class="tip" id="senstip" hidden></div></div>
+        <p class="split-note" id="sens-note"></p>
+      </section>
+    </div>
+  </div>
+
+  <section class="panel" aria-label="Ten years of frequent service">
+    <div class="panel-head">
+      <h2>Frequent service has not kept pace with coverage</h2>
+      <p>Fall schedules, weekday, 2016 · 2019 · 2026</p>
+    </div>
+    <div class="trend" id="trend"></div>
+    <p class="split-note">Most of the drop in frequent service happened between 2016 and 2019, before COVID. Schedules cannot say why. Route restructures (Route 3 split, Circle and BRT North replaced, MAX lines) and stop consolidation distort route-level comparisons, so the trend uses stop-level and area measures. This is service supplied, not ridership: the City does not publish ridership by route.</p>
+  </section>
+
+  <section class="panel" aria-label="Routes">
+    <div class="panel-head">
+      <h2>Routes</h2>
+      <p>Override a route to move it between jobs. Overrides apply to every hour.</p>
+    </div>
+    <div class="tools">
+      <input type="search" id="q" placeholder="Search route number or name" aria-label="Search routes">
+      <button type="button" class="btn" id="showall">Show all routes</button>
+      <button type="button" class="btn" id="reset" hidden>Clear overrides</button>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Route</th><th>Name</th><th class="r">Weekly bus-equiv. hrs</th><th>Weekday by hour</th><th class="r">Ridership share</th><th>Job</th><th>Override</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="notes">
+    <h2>How this is built</h2>
+    <ul>
+      <li><strong>Hours.</strong> Revenue hours are each trip's first-to-last-stop time from the published schedule, split across clock hours. A typical week is four Monday–Thursday days, a Friday, a Saturday and a Sunday. The two one-off October weekend services are left out.</li>
+      <li><strong>Frequency.</strong> For each route and hour, trips starting per direction are averaged over that hour and its neighbours, then averaged across the two directions. An hour counts toward the ridership job when that rate meets the threshold. A route can do both jobs in one day: frequent at noon and coverage at 10 pm.</li>
+      <li><strong>Routes, not corridors.</strong> Two routes sharing a street each count separately, so a corridor served every 10 minutes by two 20-minute routes shows as coverage. Use the overrides where you know a route is part of a combined frequent corridor.</li>
+      <li><strong>Deadhead.</strong> All service carries an assumed 10% deadhead on top of revenue hours. Because the rate is the same for both jobs, it changes the totals but not the split. In practice coverage routes probably carry more, since they often run farther from garages with shorter spans, so the coverage share here is if anything a little low.</li>
+      <li><strong>CTrain.</strong> CTrain is classified hour by hour with the same frequency rule, and counted in the split. A CTrain hour is a train-hour, which costs more to run and carries far more people than a bus hour, so the operating factor sets how many bus hours one train-hour is worth. Available Calgary figures put it between 2 and 3, so the default is 2.5. It is shown in a darker shade so its share stays visible.</li>
+      <li><strong>What is left out.</strong> School specials (routes 600–899) serve a third job and are excluded from the split. Ridership, revenue and cost by route are not public, so this measures what the system puts in, not what it gets back.</li>
+      <li><strong>Not the Primary Transit Network.</strong> This uses frequency, not the City's PTN corridor designation. The 10-minute mark on the slider is the PTN service standard for comparison.</li>
+    </ul>
+  </section>
+  <footer id="foot"></footer>
+</div>
+
+<script>
+const ALL = __DATA__; // {year: prep_ref.py output}
+const YEARS = Object.keys(ALL).sort();
+let DATA = ALL[YEARS[YEARS.length - 1]];
+let W = DATA.meta.days; // {mt:4, fr:1, sa:1, su:1}
+const DT_LABEL = { mt: "Weekday", sa: "Saturday", su: "Sunday" };
+const H0 = 4, H1 = 26; // hours shown in charts (04:00 to 02:00)
+
+let sensCache = null;
+const state = { year: YEARS[YEARS.length - 1], thr: 10, dt: "mt", hour: 12, lrt: 2.5, over: {}, sel: null, q: "", all: false };
+
+let bus, rail, school, counted;
+
+// Smoothed trips per hour per direction, averaged across directions (matches the preprocessing check)
+for (const y of YEARS) for (const r of ALL[y].routes) {
+  r.tph = {};
+  for (const dt of Object.keys(r.d)) {
+    const d = r.d[dt];
+    const sm = a => a.map((_, h) => ((a[h - 1] || 0) + a[h] + (a[h + 1] || 0)) / 3);
+    const s0 = sm(d.s0), s1 = sm(d.s1);
+    r.tph[dt] = r.dirs.length === 2 ? s0.map((v, h) => (v + s1[h]) / 2) : (r.dirs[0] === "1" ? s1 : s0);
+  }
+}
+function loadYear(y) {
+  DATA = ALL[y]; W = DATA.meta.days; state.year = y; state.over = {}; state.sel = null; state.all = false; sensCache = null;
+  bus = DATA.routes.filter(r => r.mode === "bus");
+  rail = DATA.routes.filter(r => r.mode === "ctrain");
+  school = DATA.routes.filter(r => r.mode === "school");
+  counted = bus.concat(rail);
+}
+
+loadYear(state.year);
+
+function isFreq(r, dt, h, thr) {
+  const o = state.over[r.id];
+  if (o === "R") return true;
+  if (o === "C") return false;
+  return r.tph[dt][h] >= 60 / thr - 1e-9;
+}
+
+const DH = 0.10; // assumed deadhead on all service
+// Bus-hour equivalents: revenue hours plus deadhead, CTrain train-hours scaled by the operating factor
+const wt = r => (1 + DH) * (r.mode === "ctrain" ? state.lrt : 1);
+
+function weekly(thr) {
+  const o = { Rb: 0, Rl: 0, Cb: 0, Cl: 0 };
+  for (const r of counted) {
+    const k = r.mode === "ctrain" ? "l" : "b", f = wt(r);
+    for (const dt of Object.keys(W)) {
+      const m = r.d[dt].m;
+      for (let h = 0; h < m.length; h++) {
+        if (!m[h]) continue;
+        o[(isFreq(r, dt, h, thr) ? "R" : "C") + k] += m[h] * W[dt] * f / 60;
+      }
+    }
+  }
+  o.R = o.Rb + o.Rl; o.C = o.Cb + o.Cl; o.T = o.R + o.C;
+  return o;
+}
+
+function routeStats(r) {
+  let R = 0, T = 0;
+  for (const dt of Object.keys(W)) {
+    const m = r.d[dt].m;
+    for (let h = 0; h < m.length; h++) { T += m[h] * W[dt]; if (m[h] && isFreq(r, dt, h, state.thr)) R += m[h] * W[dt]; }
+  }
+  return { share: T ? R / T : 0 };
+}
+
+const fmt = n => Math.round(n).toLocaleString("en-CA");
+const pct = x => Math.round(x * 100) + "%";
+const hourLabel = h => { const hh = h % 24; return (hh < 10 ? "0" : "") + hh + ":00"; };
+const hourWord = h => { const hh = h % 24; if (hh === 12) return "noon"; if (hh === 0) return "midnight"; return hh < 12 ? hh + " am" : (hh - 12) + " pm"; };
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+// ---------- Trend across fall schedules ----------
+// Numbers from results/stop_level.txt, coverage_area.txt and route_level.txt (rerun run_all.sh to refresh).
+const TREND = [
+  { t: "Midday stop-visits at 10 min or better", sub: "Share of all stop-visits, 10:00 to 15:00", unit: "%", c: "--ridership",
+    v: { 2016: 31, 2019: 24, 2026: 25 } },
+  { t: "Area with 10-minute midday service", sub: "km² within 800 m of CTrain / 400 m of a bus stop. Covered area: 463 → 485 → 509 km²", unit: " km²", c: "--ridership",
+    v: { 2016: 128, 2019: 119, 2026: 124 }, ref: { 2016: 463, 2019: 485, 2026: 509 }, refLabel: "total covered" },
+  { t: "Bus hours on routes at 10 min or better", sub: "Weekday bus revenue hours on routes running every 10 minutes or better", unit: " hrs", c: "--ridership",
+    v: { 2016: 4665, 2019: 1738, 2026: 1592 } },
+];
+function renderTrend() {
+  document.getElementById("trend").innerHTML = TREND.map(t => {
+    const max = Math.max(...Object.values(t.ref || t.v));
+    const rows = Object.keys(t.v).map(y => {
+      const w = x => (x / max * 100).toFixed(1);
+      return `<div class="trow"><span class="num">${y}</span><span class="tr"><span style="position:relative;flex:1;height:16px;display:block">
+        ${t.ref ? `<span class="fill" style="position:absolute;left:0;width:${w(t.ref[y])}%;background:var(--idle);height:16px"></span>` : ""}
+        <span class="fill" style="position:absolute;left:0;width:${w(t.v[y])}%;background:var(${t.c});height:16px;${y === state.year ? "" : "opacity:.55"}"></span></span>
+        <span class="v">${t.v[y].toLocaleString("en-CA")}${t.unit}</span></span></div>`;
+    }).join("");
+    return `<div class="tcard"><h3>${t.t}</h3><div class="tbars">${rows}</div><p class="sub">${t.sub}</p></div>`;
+  }).join("");
+}
+
+// ---------- Headline split ----------
+function renderSplit() {
+  const w = weekly(state.thr), T = w.T;
+  document.getElementById("pctR").textContent = pct(w.R / T);
+  document.getElementById("pctC").textContent = pct(w.C / T);
+  document.getElementById("hrsR").textContent = `${fmt(w.Rb)} bus + ${fmt(w.Rl)} CTrain hrs / week`;
+  document.getElementById("hrsC").textContent = `${fmt(w.Cb)} bus + ${fmt(w.Cl)} CTrain hrs / week`;
+  for (const k of ["Rl", "Rb", "Cb", "Cl"]) document.getElementById("bar" + k).style.flex = `${w[k] / T} 1 0`;
+  document.getElementById("splitbar").setAttribute("aria-label",
+    `Ridership ${pct(w.R / T)} (bus ${pct(w.Rb / T)}, CTrain ${pct(w.Rl / T)}); coverage ${pct(w.C / T)} (bus ${pct(w.Cb / T)}, CTrain ${pct(w.Cl / T)})`);
+  const schH = school.reduce((s, r) => s + r.wkh, 0);
+  document.getElementById("split-note").textContent =
+    `Of ${fmt(T)} weekly service hours, ${pct(w.R / T)} run every ${state.thr} minutes or better. CTrain makes up ${pct((w.Rl + w.Cl) / T)} of the total at ${state.lrt.toFixed(1)}× bus hours. All figures include an assumed 10% deadhead. School specials (${fmt(schH * (1 + DH))} hours) are not counted.`;
+  document.getElementById("lrt-legend").textContent = state.lrt.toFixed(1);
+}
+
+// ---------- Map ----------
+const canvas = document.getElementById("map");
+const ctx = canvas.getContext("2d");
+let proj = null;
+const allPts = YEARS.flatMap(y => ALL[y].routes.filter(r => r.mode !== "school").flatMap(r => r.g.flat()));
+const lon0 = Math.min(...allPts.map(p => p[0])), lon1 = Math.max(...allPts.map(p => p[0]));
+const lat0 = Math.min(...allPts.map(p => p[1])), lat1 = Math.max(...allPts.map(p => p[1]));
+const kx = Math.cos(((lat0 + lat1) / 2) * Math.PI / 180);
+
+function sizeMap() {
+  const box = document.getElementById("mapbox");
+  const dpr = window.devicePixelRatio || 1;
+  const w = box.clientWidth, h = box.clientHeight;
+  canvas.width = w * dpr; canvas.height = h * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const pad = 10;
+  const sx = (w - 2 * pad) / ((lon1 - lon0) * kx), sy = (h - 2 * pad) / (lat1 - lat0);
+  const s = Math.min(sx, sy);
+  const ox = (w - (lon1 - lon0) * kx * s) / 2, oy = (h - (lat1 - lat0) * s) / 2;
+  proj = { s, ox, oy, w, h, x: lon => ox + (lon - lon0) * kx * s, y: lat => h - oy - (lat - lat0) * s };
+  for (const y of YEARS) for (const r of ALL[y].routes) if (r.g) r.px = r.g.map(line => line.map(p => [proj.x(p[0]), proj.y(p[1])]));
+}
+
+function routeClassAt(r, dt, h) {
+  if (!r.d[dt].m[h]) return "idle";
+  return isFreq(r, dt, h, state.thr) ? "R" : "C";
+}
+
+function drawMap() {
+  if (!proj) return;
+  const cR = css("--ridership"), cC = css("--coverage"), cI = css("--idle"), cBg = css("--surface"), cInk = css("--ink"), cMuted = css("--muted");
+  ctx.clearRect(0, 0, proj.w, proj.h);
+  ctx.lineJoin = "round"; ctx.lineCap = "round";
+  const groups = { idle: [], C: [], R: [] };
+  for (const r of bus) groups[routeClassAt(r, state.dt, state.hour)].push(r);
+  const stroke = (r, color, width) => {
+    ctx.strokeStyle = color; ctx.lineWidth = width;
+    for (const line of r.px) { ctx.beginPath(); line.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.stroke(); }
+  };
+  groups.idle.forEach(r => stroke(r, cI, 1));
+  groups.C.forEach(r => stroke(r, cC, 1.6));
+  const cRr = css("--ridership-rail"), cCr = css("--coverage-rail");
+  rail.forEach(r => { const c = routeClassAt(r, state.dt, state.hour); stroke(r, cBg, 7.5); stroke(r, c === "R" ? cRr : c === "C" ? cCr : cI, 4.5); });
+  groups.R.forEach(r => { stroke(r, cBg, 5); stroke(r, cR, 3); });
+  if (state.sel) {
+    const r = DATA.routes.find(x => x.id === state.sel);
+    if (r && r.px) { stroke(r, cBg, 8); stroke(r, cInk, 4.5); }
+  }
+  // scale bar: 5 km
+  const kmPx = proj.s / 111.32 * 1; // pixels per km of latitude
+  const L = 5 * kmPx, x = 14, y = proj.h - 16;
+  ctx.strokeStyle = cMuted; ctx.lineWidth = 1.5; ctx.lineCap = "butt";
+  ctx.beginPath(); ctx.moveTo(x, y - 4); ctx.lineTo(x, y); ctx.lineTo(x + L, y); ctx.lineTo(x + L, y - 4); ctx.stroke();
+  ctx.fillStyle = cMuted; ctx.font = "11px 'IBM Plex Mono', monospace"; ctx.fillText("5 km", x + L + 6, y + 3);
+  ctx.fillText("N ↑", proj.w - 34, 20);
+}
+
+function segDist(px, py, a, b) {
+  const dx = b[0] - a[0], dy = b[1] - a[1], l2 = dx * dx + dy * dy;
+  let t = l2 ? ((px - a[0]) * dx + (py - a[1]) * dy) / l2 : 0; t = Math.max(0, Math.min(1, t));
+  const x = a[0] + t * dx, y = a[1] + t * dy; return Math.hypot(px - x, py - y);
+}
+function nearestRoute(px, py) {
+  let best = null, bd = 9;
+  for (const r of counted) for (const line of r.px) for (let i = 1; i < line.length; i++) {
+    const d = segDist(px, py, line[i - 1], line[i]);
+    if (d < bd || (d === bd && best && r.wkh > best.wkh)) { bd = d; best = r; }
+  }
+  return best;
+}
+const maptip = document.getElementById("maptip");
+canvas.addEventListener("pointermove", e => {
+  const b = canvas.getBoundingClientRect(), x = e.clientX - b.left, y = e.clientY - b.top;
+  const r = nearestRoute(x, y);
+  if (!r) { maptip.hidden = true; canvas.style.cursor = "default"; return; }
+  canvas.style.cursor = "pointer";
+  const c = routeClassAt(r, state.dt, state.hour);
+  const tph = r.tph[state.dt][state.hour];
+  const what = c === "idle" ? "Not running" : (c === "R" ? "Ridership job" : "Coverage job");
+  maptip.innerHTML = `<b>${r.n} ${r.name}</b><br>${what} at ${hourLabel(state.hour)}${c !== "idle" ? ` · about every ${Math.round(60 / tph)} min` : ""}`;
+  maptip.hidden = false;
+  const tw = maptip.offsetWidth;
+  maptip.style.left = Math.min(x + 12, b.width - tw - 4) + "px";
+  maptip.style.top = (y + 14) + "px";
+});
+canvas.addEventListener("pointerleave", () => { maptip.hidden = true; });
+canvas.addEventListener("click", e => {
+  const b = canvas.getBoundingClientRect();
+  const r = nearestRoute(e.clientX - b.left, e.clientY - b.top);
+  select(r ? r.id : null);
+});
+
+function select(id) {
+  state.sel = id; drawMap(); renderDetail(); renderTable();
+}
+
+function renderDetail() {
+  const el = document.getElementById("detail");
+  const r = DATA.routes.find(x => x.id === state.sel);
+  if (!r) { el.hidden = true; return; }
+  el.hidden = false;
+  const isRail = r.mode === "ctrain";
+  const cR = css(isRail ? "--ridership-rail" : "--ridership"), cC = css(isRail ? "--coverage-rail" : "--coverage"), cI = css("--idle");
+  const cells = [];
+  for (let h = 5; h <= 25; h++) {
+    const c = routeClassAt(r, state.dt, h);
+    const t = r.tph[state.dt][h];
+    cells.push(`<div title="${hourLabel(h)}: ${c === "idle" ? "not running" : "about every " + Math.round(60 / t) + " min"}" style="background:${c === "R" ? cR : c === "C" ? cC : cI}"></div>`);
+  }
+  const st = routeStats(r);
+  el.innerHTML = `<h3>${r.n} ${r.name}</h3>
+    <div class="row"><span class="num">${fmt(r.wkh)} ${isRail ? "train-hrs" : "revenue hrs"} / week</span><span>·</span><span>${pct(st.share)} of its hours in the ridership job</span></div>
+    <div class="eyebrow" style="text-transform:none;letter-spacing:0">${DT_LABEL[state.dt]}, hour by hour</div>
+    <div class="strip">${cells.join("")}</div>
+    <div class="strip-axis"><span>05:00</span><span>15:00</span><span>01:00</span></div>`;
+}
+
+// ---------- Time-of-day chart ----------
+function renderTOD() {
+  const svg = document.getElementById("tod");
+  const wrap = document.getElementById("tod-wrap");
+  const w = wrap.clientWidth, h = 210, m = { l: 40, r: 8, t: 10, b: 24 };
+  svg.setAttribute("viewBox", `0 0 ${w} ${h}`); svg.setAttribute("height", h);
+  const hours = []; for (let x = H0; x < H1; x++) hours.push(x);
+  const L = { Rl: [], Rb: [], Cb: [], Cl: [] };
+  for (const x of hours) {
+    const o = { Rl: 0, Rb: 0, Cb: 0, Cl: 0 };
+    for (const r of counted) {
+      const v = r.d[state.dt].m[x]; if (!v) continue;
+      o[(isFreq(r, state.dt, x, state.thr) ? "R" : "C") + (r.mode === "ctrain" ? "l" : "b")] += v * wt(r) / 60;
+    }
+    for (const k in o) L[k].push(o[k]);
+  }
+  // cumulative stack, bottom to top: CTrain ridership, bus ridership, bus coverage, CTrain coverage
+  const order = ["Rl", "Rb", "Cb", "Cl"], cum = [hours.map(() => 0)];
+  for (const k of order) cum.push(cum[cum.length - 1].map((v, i) => v + L[k][i]));
+  const T = cum[4], R = cum[2];
+  const max = Math.max(...T);
+  const step = max > 600 ? 200 : max > 300 ? 100 : 50;
+  const ymax = Math.ceil(max / step) * step;
+  const X = i => m.l + (i / (hours.length - 1)) * (w - m.l - m.r);
+  const Y = v => h - m.b - (v / ymax) * (h - m.t - m.b);
+  const area = (top, bot) => "M" + top.map((v, i) => `${X(i)},${Y(v)}`).join("L") + "L" + bot.map((v, i) => `${X(i)},${Y(v)}`).reverse().join("L") + "Z";
+  let g = `<g class="grid">`;
+  for (let v = 0; v <= ymax; v += step) g += `<line x1="${m.l}" x2="${w - m.r}" y1="${Y(v)}" y2="${Y(v)}"/><text x="${m.l - 6}" y="${Y(v) + 4}" text-anchor="end">${fmt(v)}</text>`;
+  g += `</g>`;
+  let xt = ""; (w < 480 ? [6, 12, 18, 24] : [6, 9, 12, 15, 18, 21, 24]).forEach(x => { const i = hours.indexOf(x); if (i >= 0) xt += `<text x="${X(i)}" y="${h - 6}" text-anchor="middle">${hourLabel(x)}</text>`; });
+  const si = hours.indexOf(state.hour);
+  svg.innerHTML = g + xt +
+    [["--ridership-rail", 0], ["--ridership", 1], ["--coverage", 2], ["--coverage-rail", 3]].map(([c, j]) => `<path d="${area(cum[j + 1], cum[j])}" fill="var(${c})"/>`).join("") +
+    [1, 2, 3].map(j => `<path d="M${cum[j].map((v, i) => `${X(i)},${Y(v)}`).join("L")}" fill="none" stroke="var(--surface)" stroke-width="${j === 2 ? 2 : 1}"/>`).join("") +
+    (si >= 0 ? `<line x1="${X(si)}" x2="${X(si)}" y1="${m.t}" y2="${h - m.b}" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="3 3"/>` : "") +
+    `<line id="todx" x1="0" x2="0" y1="${m.t}" y2="${h - m.b}" stroke="var(--muted)" stroke-width="1" visibility="hidden"/>` +
+    `<rect x="${m.l}" y="${m.t}" width="${w - m.l - m.r}" height="${h - m.t - m.b}" fill="transparent" id="todhit" style="cursor:pointer"/>`;
+  document.getElementById("day-label").textContent = `${DT_LABEL[state.dt]} service hours by clock hour, CTrain at ${state.lrt.toFixed(1)}×`;
+  const tip = document.getElementById("todtip"), hit = svg.querySelector("#todhit"), cx = svg.querySelector("#todx");
+  const idxAt = e => { const b = svg.getBoundingClientRect(); const x = (e.clientX - b.left) * (w / b.width); return Math.max(0, Math.min(hours.length - 1, Math.round((x - m.l) / (w - m.l - m.r) * (hours.length - 1)))); };
+  hit.addEventListener("pointermove", e => {
+    const i = idxAt(e); cx.setAttribute("x1", X(i)); cx.setAttribute("x2", X(i)); cx.setAttribute("visibility", "visible");
+    tip.innerHTML = `<b>${hourLabel(hours[i])}</b><br>Ridership ${fmt(R[i])} hrs <span style="opacity:.75">(CTrain ${fmt(L.Rl[i])})</span><br>Coverage ${fmt(T[i] - R[i])} hrs <span style="opacity:.75">(CTrain ${fmt(L.Cl[i])})</span>`;
+    tip.hidden = false;
+    const b = svg.getBoundingClientRect(); const px = X(i) * (b.width / w);
+    tip.style.left = Math.min(px + 10, b.width - tip.offsetWidth - 4) + "px"; tip.style.top = "8px";
+  });
+  hit.addEventListener("pointerleave", () => { tip.hidden = true; cx.setAttribute("visibility", "hidden"); });
+  hit.addEventListener("click", e => setHour(Math.max(5, Math.min(24, hours[idxAt(e)]))));
+}
+
+// ---------- Sensitivity chart ----------
+function renderSens() {
+  const svg = document.getElementById("sens"), wrap = document.getElementById("sens-wrap");
+  const w = wrap.clientWidth, h = 170, m = { l: 40, r: 26, t: 12, b: 26 };
+  svg.setAttribute("viewBox", `0 0 ${w} ${h}`); svg.setAttribute("height", h);
+  const key = JSON.stringify([state.over, state.lrt]);
+  if (!sensCache || sensCache.key !== key) {
+    const pts = [];
+    for (let t = 5; t <= 30; t++) { const x = weekly(t); pts.push([t, x.R / x.T]); }
+    sensCache = { key, pts };
+  }
+  const pts = sensCache.pts;
+  const X = t => m.l + ((t - 5) / 25) * (w - m.l - m.r);
+  const Y = v => h - m.b - v * (h - m.t - m.b);
+  let g = `<g class="grid">`;
+  [0, 0.25, 0.5, 0.75, 1].forEach(v => g += `<line x1="${m.l}" x2="${w - m.r}" y1="${Y(v)}" y2="${Y(v)}"/><text x="${m.l - 6}" y="${Y(v) + 4}" text-anchor="end">${v * 100}%</text>`);
+  g += `</g>`;
+  (w < 480 ? [5, 10, 20, 30] : [5, 10, 15, 20, 25, 30]).forEach(t => g += `<text x="${X(t)}" y="${h - 8}" text-anchor="middle">${t} min</text>`);
+  const cur = pts.find(p => p[0] === state.thr);
+  const ptn = pts.find(p => p[0] === 10);
+  svg.innerHTML = g +
+    `<line x1="${X(10)}" x2="${X(10)}" y1="${m.t}" y2="${h - m.b}" stroke="var(--muted)" stroke-dasharray="2 3"/>` +
+    `<text x="${X(10) + 4}" y="${m.t + 10}" text-anchor="start">PTN standard</text>` +
+    `<path d="M${pts.map(p => `${X(p[0])},${Y(p[1])}`).join("L")}" fill="none" stroke="var(--ridership)" stroke-width="2" stroke-linejoin="round"/>` +
+    `<circle cx="${X(cur[0])}" cy="${Y(cur[1])}" r="5" fill="var(--ridership)" stroke="var(--surface)" stroke-width="2"/>` +
+    `<rect x="${m.l}" y="${m.t}" width="${w - m.l - m.r}" height="${h - m.t - m.b}" fill="transparent" id="senshit" style="cursor:pointer"/>`;
+  const tip = document.getElementById("senstip"), hit = svg.querySelector("#senshit");
+  const tAt = e => { const b = svg.getBoundingClientRect(); const x = (e.clientX - b.left) * (w / b.width); return Math.max(5, Math.min(30, Math.round(5 + (x - m.l) / (w - m.l - m.r) * 25))); };
+  hit.addEventListener("pointermove", e => {
+    const t = tAt(e), p = pts.find(q => q[0] === t);
+    tip.innerHTML = `Every ${t} min or better<br><b>${pct(p[1])}</b> of hours`; tip.hidden = false;
+    const b = svg.getBoundingClientRect(); const px = X(t) * (b.width / w);
+    tip.style.left = Math.min(px + 10, b.width - tip.offsetWidth - 4) + "px"; tip.style.top = "8px";
+  });
+  hit.addEventListener("pointerleave", () => { tip.hidden = true; });
+  hit.addEventListener("click", e => setThr(tAt(e)));
+  document.getElementById("sens-note").textContent =
+    `At the PTN standard of every 10 minutes, ${pct(ptn[1])} of weekly service hours qualify. Loosen the line to every 20 minutes and it's ${pct(pts.find(p => p[0] === 20)[1])}.`;
+}
+
+// ---------- Table ----------
+function renderTable() {
+  const tb = document.getElementById("rows");
+  const q = state.q.trim().toLowerCase();
+  let list = counted.slice().sort((a, b) => b.wkh * wt(b) - a.wkh * wt(a));
+  if (q) list = list.filter(r => (r.n + " " + r.name).toLowerCase().includes(q));
+  const limited = !state.all && !q;
+  if (limited) list = list.slice(0, 25);
+  const cI = css("--idle");
+  tb.innerHTML = list.map(r => {
+    const isRail = r.mode === "ctrain";
+    const cR = css(isRail ? "--ridership-rail" : "--ridership"), cC = css(isRail ? "--coverage-rail" : "--coverage");
+    const st = routeStats(r);
+    const job = st.share >= 0.67 ? ["R", "Ridership"] : st.share <= 0.33 ? ["C", "Coverage"] : ["M", "Both"];
+    let mini = "";
+    for (let h = 6; h < 24; h++) { const c = routeClassAt(r, "mt", h); mini += `<div style="flex:1;background:${c === "R" ? cR : c === "C" ? cC : cI}"></div>`; }
+    const o = state.over[r.id] || "auto";
+    return `<tr data-id="${r.id}" class="${state.sel === r.id ? "sel" : ""}">
+      <td class="rtn">${r.n}</td><td>${r.name}${isRail ? ` <span class="pill M">CTrain · ${fmt(r.wkh)} train-hrs</span>` : ""}</td><td class="r num">${fmt(r.wkh * wt(r) / (1 + DH))}</td>
+      <td><div class="mini" title="06:00 to midnight">${mini}</div></td>
+      <td class="r num">${pct(st.share)}</td>
+      <td><span class="pill ${job[0]}">${job[1]}</span></td>
+      <td><select data-id="${r.id}" aria-label="Override route ${r.n}">
+        <option value="auto"${o === "auto" ? " selected" : ""}>By frequency</option>
+        <option value="R"${o === "R" ? " selected" : ""}>Ridership</option>
+        <option value="C"${o === "C" ? " selected" : ""}>Coverage</option></select></td></tr>`;
+  }).join("");
+  const sa = document.getElementById("showall");
+  sa.hidden = !!q; sa.textContent = state.all ? "Show top 25" : `Show all ${counted.length} routes`;
+  document.getElementById("reset").hidden = Object.keys(state.over).length === 0;
+}
+document.getElementById("rows").addEventListener("click", e => {
+  if (e.target.closest("select")) return;
+  const tr = e.target.closest("tr"); if (tr) select(state.sel === tr.dataset.id ? null : tr.dataset.id);
+});
+document.getElementById("rows").addEventListener("change", e => {
+  const s = e.target.closest("select"); if (!s) return;
+  if (s.value === "auto") delete state.over[s.dataset.id]; else state.over[s.dataset.id] = s.value;
+  renderAll();
+});
+document.getElementById("q").addEventListener("input", e => { state.q = e.target.value; renderTable(); });
+document.getElementById("showall").addEventListener("click", () => { state.all = !state.all; renderTable(); });
+document.getElementById("reset").addEventListener("click", () => { state.over = {}; renderAll(); });
+
+// ---------- Controls ----------
+function setThr(t) { state.thr = t; document.getElementById("thr").value = t; document.getElementById("thr-val").textContent = t; renderAll(); }
+function setHour(h) {
+  state.hour = h; document.getElementById("hour").value = h;
+  document.getElementById("clock").textContent = hourLabel(h);
+  document.getElementById("clock-h").textContent = hourWord(h);
+  drawMap(); renderTOD(); renderDetail();
+}
+document.getElementById("thr").addEventListener("input", e => setThr(+e.target.value));
+document.getElementById("hour").addEventListener("input", e => { stopPlay(); setHour(+e.target.value); });
+document.getElementById("lrt").addEventListener("input", e => {
+  state.lrt = +e.target.value; document.getElementById("lrt-val").textContent = state.lrt.toFixed(1);
+  renderSplit(); renderTOD(); renderSens(); renderTable();
+});
+document.getElementById("years").innerHTML = YEARS.map(y => `<button type="button" data-y="${y}" aria-pressed="${y === state.year}">${y}</button>`).join("");
+document.getElementById("years").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  document.querySelectorAll("#years button").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+  loadYear(b.dataset.y); renderYear(); renderAll();
+});
+document.getElementById("days").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  state.dt = b.dataset.d;
+  document.querySelectorAll("#days button").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+  drawMap(); renderTOD(); renderDetail();
+});
+let timer = null;
+function stopPlay() { if (timer) { clearInterval(timer); timer = null; document.getElementById("play").textContent = "Play the day"; } }
+document.getElementById("play").addEventListener("click", () => {
+  if (timer) return stopPlay();
+  document.getElementById("play").textContent = "Pause";
+  let h = state.hour >= 24 ? 5 : state.hour;
+  setHour(h);
+  timer = setInterval(() => { h++; if (h > 24) { stopPlay(); return; } setHour(h); }, 700);
+});
+
+function renderAll() { renderSplit(); drawMap(); renderTOD(); renderSens(); renderTable(); renderDetail(); renderTrend(); }
+
+function renderYear() {
+  document.getElementById("foot").textContent = `Data: ${DATA.meta.feed}. ${DATA.meta.period}. Revenue hours from scheduled trip times; not an official Calgary Transit figure.`;
+  document.getElementById("eyebrow").textContent = `Calgary Transit · fall ${state.year} schedule`;
+}
+renderTrend(); renderYear();
+
+sizeMap(); renderAll(); setHour(12);
+let rt; new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(() => { sizeMap(); drawMap(); renderTOD(); renderSens(); }, 80); }).observe(document.querySelector(".wrap"));
+const redraw = () => { drawMap(); renderTable(); renderDetail(); };
+try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", redraw); } catch (e) {}
+new MutationObserver(redraw).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+</script>

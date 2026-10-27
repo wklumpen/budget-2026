@@ -1,0 +1,27 @@
+== 2016 Tue 18 Oct: 11006 trips, 5887 stops with any weekday service
+  midday 10-15: stops served in window 5521
+     >= every 10min:  12.5% of stops |  30.7% of stop-visits
+     >= every 15min:  25.7% of stops |  50.4% of stop-visits
+     >= every 20min:  40.1% of stops |  65.6% of stop-visits
+  evening 19-22: stops served in window 5186
+     >= every 10min:   7.1% of stops |  20.7% of stop-visits
+     >= every 15min:  18.5% of stops |  42.2% of stop-visits
+     >= every 20min:  24.7% of stops |  50.2% of stop-visits
+== 2019 Tue 22 Oct: 12076 trips, 5997 stops with any weekday service
+  midday 10-15: stops served in window 5660
+     >= every 10min:   9.3% of stops |  24.0% of stop-visits
+     >= every 15min:  22.4% of stops |  45.3% of stop-visits
+     >= every 20min:  38.8% of stops |  63.4% of stop-visits
+  evening 19-22: stops served in window 5407
+     >= every 10min:   4.7% of stops |  14.9% of stop-visits
+     >= every 15min:  17.8% of stops |  40.1% of stop-visits
+     >= every 20min:  25.1% of stops |  50.0% of stop-visits
+== 2026 Tue 3 Nov: 11165 trips, 5945 stops with any weekday service
+  midday 10-15: stops served in window 5835
+     >= every 10min:   9.3% of stops |  24.5% of stop-visits
+     >= every 15min:  22.2% of stops |  44.3% of stop-visits
+     >= every 20min:  35.6% of stops |  58.9% of stop-visits
+  evening 19-22: stops served in window 5714
+     >= every 10min:   7.3% of stops |  20.8% of stop-visits
+     >= every 15min:  18.9% of stops |  40.5% of stop-visits
+     >= every 20min:  31.9% of stops |  56.2% of stop-visits
