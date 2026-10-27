@@ -1,4 +1,4 @@
-<title>Calgary Transit's Two Jobs</title>
+<title>Transit's Conflicting Priorities</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,14 +50,13 @@ p { margin: 0; }
 .eyebrow { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 header { display: grid; gap: 12px; padding-top: 18px; position: relative; }
-header::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--ridership-rail) 0, var(--ridership) 38%, var(--coverage) 62%, var(--coverage-rail) 100%); }
-h1 { background: linear-gradient(90deg, var(--ridership) 0, var(--coverage) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; width: fit-content; max-width: 100%; }
+header::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--ridership) 50%, var(--coverage) 50%); }
 .k { font-weight: 700; }
 .k.f { color: var(--ridership); }
 .k.c { color: var(--coverage); }
 
 /* Headline split */
-.split { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid; border-image: linear-gradient(90deg, var(--ridership), var(--coverage)) 1; border-radius: 0; padding: 20px; display: grid; gap: 14px; }
+.split { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid; border-image: linear-gradient(90deg, var(--ridership) 50%, var(--coverage) 50%) 1; border-radius: 0; padding: 20px; display: grid; gap: 14px; }
 .split-figs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .fig { display: grid; gap: 2px; min-width: 0; }
 .fig .big { font-family: var(--display); font-weight: 700; font-size: clamp(2.6rem, 9vw, 4.2rem); line-height: 1; font-variant-numeric: tabular-nums; }
@@ -168,7 +167,7 @@ footer { color: var(--muted); font-size: 0.8rem; }
 <div class="wrap">
   <header>
     <div class="eyebrow" id="eyebrow">Calgary Transit · fall 2026 schedule</div>
-    <h1>Calgary Transit's Two Jobs</h1>
+    <h1>Transit's Conflicting Priorities</h1>
     <p class="lede">Transit provides two different types of service: <strong class="k f">Frequency</strong> service moves lots of people efficiently, and drives ridership. <strong class="k c">Coverage</strong> service ensures that everyone in Calgary is near a stop. Even though these different services have different goals, right now <strong>we judge them the same way</strong>, usually on productivity.</p>
     <p class="lede">Right now, our city policies on transit and land use mean that we continue to drift more and more towards coverage-based service. Adding new subdivisions on the edge of the city and not funding our Primary Transit Network properly are two ways that this shift happens.</p>
     <p class="lede">There is no right or wrong balance of coverage and frequent service, but Calgarians and Council have not been asked how they prefer to balance things. In this page, we explore how that balance works, and how it has changed over time.</p>
