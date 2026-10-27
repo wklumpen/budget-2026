@@ -216,6 +216,30 @@ th { border-bottom: 2px solid var(--ink); }
   #hour { width: 100%; flex: 1 1 100%; }
   td, th { font-size: 0.95rem; }
 }
+
+/* Choices and the ask */
+.choices { display: grid; gap: 18px; }
+.choices-head { display: grid; gap: 8px; }
+.options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+@media (max-width: 760px) { .options { grid-template-columns: minmax(0, 1fr); } }
+.opt { background: var(--surface); border: 2px solid var(--ink); border-top-width: 12px; padding: 18px 20px 20px; display: grid; gap: 8px; align-content: start; box-shadow: 6px 6px 0 var(--ink); }
+.opt.cov { border-top-color: var(--coverage); }
+.opt.freq { border-top-color: var(--ridership); }
+.opt h3 { margin: 0; font-family: var(--display); font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; font-size: 1.7rem; line-height: 1.05; }
+.opt.cov h3 { color: var(--coverage); }
+.opt.freq h3 { color: var(--ridership); }
+.opt h4 { margin: 8px 0 0; font-family: var(--mono); font-size: 0.74rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.opt ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; }
+.choices-note { font-family: var(--display); font-weight: 600; font-size: 1.35rem; }
+.ask { background: var(--ink); color: var(--surface); padding: 24px 22px 26px; display: grid; gap: 14px; }
+.ask h2 { font-size: clamp(2rem, 6vw, 3rem); }
+.ask ol { margin: 0; padding: 0; list-style: none; counter-reset: ask; display: grid; gap: 14px; }
+.ask li { counter-increment: ask; display: grid; grid-template-columns: 2.4rem 1fr; gap: 12px; font-size: 1.08rem; line-height: 1.4; }
+.ask li::before { content: counter(ask); font-family: var(--display); font-weight: 700; font-size: 2.6rem; line-height: 0.9; color: var(--coverage); }
+.ask li:nth-child(2)::before { color: var(--ridership); }
+.ask li strong { display: block; font-family: var(--display); font-size: 1.5rem; text-transform: uppercase; letter-spacing: 0.02em; line-height: 1.1; }
+.ask p { color: var(--surface); opacity: .85; max-width: 62ch; }
+@media (max-width: 600px) { .opt { box-shadow: 4px 4px 0 var(--ink); } .ask li { font-size: 1.12rem; } }
 </style>
 </head>
 <body>
@@ -336,6 +360,58 @@ th { border-bottom: 2px solid var(--ink); }
     </div>
     <div class="trend" id="trend"></div>
     <p class="split-note">Most of the drop in frequent service happened between 2016 and 2019, before COVID. Schedules cannot say why. Route restructures (Route 3 split, Circle and BRT North replaced, MAX lines) and stop consolidation distort route-level comparisons, so the trend uses stop-level and area measures. This is service supplied, not ridership: the City does not publish ridership by route.</p>
+  </section>
+
+  <section class="choices" aria-label="What could we do differently">
+    <div class="choices-head">
+      <h2>What could we do differently?</h2>
+      <p class="lede">Every hour of service goes to one job or the other. Moving hours between them is a choice, and it has consequences either way.</p>
+    </div>
+    <div class="options">
+      <article class="opt cov">
+        <h3>Lean toward coverage</h3>
+        <h4>What we could do</h4>
+        <ul>
+          <li>Extend routes into new communities as they open.</li>
+          <li>Keep low-use local routes running everywhere they run today.</li>
+          <li>Add evening and weekend hours to existing local routes.</li>
+        </ul>
+        <h4>What follows</h4>
+        <ul>
+          <li>More of the city is within a short walk of a stop.</li>
+          <li>Hours are spread thin. Routes run every 30 to 60 minutes, so trips take planning and a missed transfer is a long wait.</li>
+          <li>Less is left for frequent corridors, which stay as they are or slip.</li>
+          <li>Cost grows with the size of the city, whether or not ridership grows with it.</li>
+        </ul>
+      </article>
+      <article class="opt freq">
+        <h3>Lean toward frequency</h3>
+        <h4>What we could do</h4>
+        <ul>
+          <li>Fund the Primary Transit Network: every 10 minutes or better, all day, every day.</li>
+          <li>Pay for it by reshaping the lowest-use local routes, or by directing growth in the transit budget to it.</li>
+          <li>Ask for frequent service along the corridors where new housing is approved.</li>
+        </ul>
+        <h4>What follows</h4>
+        <ul>
+          <li>Turn-up-and-go service: no timetable to check, short waits for transfers, more places within reach.</li>
+          <li>Frequent service is where ridership is most likely to grow. The City doesn't publish ridership by route, so this can't be tested in Calgary yet.</li>
+          <li>Some edge areas would get less service, which hurts the people who have no other way to travel.</li>
+          <li>It needs a plan for those areas, such as on-demand service or a longer walk to a better stop.</li>
+        </ul>
+      </article>
+    </div>
+    <p class="choices-note">Neither is wrong. Today we are choosing between them without saying so.</p>
+  </section>
+
+  <section class="ask" aria-label="The ask">
+    <h2>The ask</h2>
+    <ol>
+      <li><strong>Budget the two services separately.</strong> In the 2027&ndash;2030 budget, show a coverage line and a frequency line, and have Council set the balance between them on purpose.</li>
+      <li><strong>Make land use decisions report on both.</strong> New communities and major rezonings should show their effect on the coverage line and the frequency line before they are approved.</li>
+      <li><strong>Ask Calgarians.</strong> Put the balance question to the public. Edmonton has.</li>
+    </ol>
+    <p>This is a question about balance, not a call to cut coverage. Administration is best placed to cost the options.</p>
   </section>
 
   <section class="panel" aria-label="Routes">
