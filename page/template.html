@@ -280,8 +280,8 @@ th { border-bottom: 2px solid var(--ink); }
   <section class="controls" aria-label="Settings">
     <div class="ctl">
       <label for="thr">Counts as frequent: every <span class="val" id="thr-val">10</span> min or better</label>
-      <input type="range" id="thr" min="5" max="30" step="5" value="10">
-      <div class="ticks"><span>5</span><span>10</span><span>15</span><span>20</span><span>25</span><span>30</span></div>
+      <input type="range" id="thr" min="10" max="30" step="5" value="10">
+      <div class="ticks"><span>10</span><span>15</span><span>20</span><span>25</span><span>30</span></div>
     </div>
     <div class="ctl">
       <span class="ctl-l">Fall schedule</span>
@@ -793,16 +793,16 @@ function renderSens() {
   const key = JSON.stringify([state.over, state.lrt]);
   if (!sensCache || sensCache.key !== key) {
     const pts = [];
-    for (let t = 5; t <= 30; t++) { const x = weekly(t); pts.push([t, x.R / x.T]); }
+    for (let t = 10; t <= 30; t++) { const x = weekly(t); pts.push([t, x.R / x.T]); }
     sensCache = { key, pts };
   }
   const pts = sensCache.pts;
-  const X = t => m.l + ((t - 5) / 25) * (w - m.l - m.r);
+  const X = t => m.l + ((t - 10) / 20) * (w - m.l - m.r);
   const Y = v => h - m.b - v * (h - m.t - m.b);
   let g = `<g class="grid">`;
   [0, 0.25, 0.5, 0.75, 1].forEach(v => g += `<line x1="${m.l}" x2="${w - m.r}" y1="${Y(v)}" y2="${Y(v)}"/><text x="${m.l - 6}" y="${Y(v) + 4}" text-anchor="end">${v * 100}%</text>`);
   g += `</g>`;
-  (w < 480 ? [5, 10, 20, 30] : [5, 10, 15, 20, 25, 30]).forEach(t => g += `<text x="${X(t)}" y="${h - 8}" text-anchor="middle">${t} min</text>`);
+  (w < 480 ? [10, 20, 30] : [10, 15, 20, 25, 30]).forEach(t => g += `<text x="${X(t)}" y="${h - 8}" text-anchor="middle">${t} min</text>`);
   const cur = pts.find(p => p[0] === state.thr);
   const ptn = pts.find(p => p[0] === 10);
   svg.innerHTML = g +
@@ -812,7 +812,7 @@ function renderSens() {
     `<circle cx="${X(cur[0])}" cy="${Y(cur[1])}" r="5" fill="var(--ridership)" stroke="var(--surface)" stroke-width="2"/>` +
     `<rect x="${m.l}" y="${m.t}" width="${w - m.l - m.r}" height="${h - m.t - m.b}" fill="transparent" id="senshit" style="cursor:pointer"/>`;
   const tip = document.getElementById("senstip"), hit = svg.querySelector("#senshit");
-  const tAt = e => { const b = svg.getBoundingClientRect(); const x = (e.clientX - b.left) * (w / b.width); return Math.max(5, Math.min(30, 5 * Math.round((5 + (x - m.l) / (w - m.l - m.r) * 25) / 5))); };
+  const tAt = e => { const b = svg.getBoundingClientRect(); const x = (e.clientX - b.left) * (w / b.width); return Math.max(10, Math.min(30, 5 * Math.round((10 + (x - m.l) / (w - m.l - m.r) * 20) / 5))); };
   hit.addEventListener("pointermove", e => {
     const t = tAt(e), p = pts.find(q => q[0] === t);
     tip.innerHTML = `Every ${t} min or better<br><b>${pct(p[1])}</b> of hours`; tip.hidden = false;
