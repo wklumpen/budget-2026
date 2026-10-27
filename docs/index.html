@@ -190,7 +190,7 @@ footer { color: var(--muted); font-size: 0.8rem; }
   <section class="controls" aria-label="Settings">
     <div class="ctl">
       <label for="thr">Counts as frequent: every <span class="val" id="thr-val">10</span> min or better</label>
-      <input type="range" id="thr" min="5" max="30" step="1" value="10">
+      <input type="range" id="thr" min="5" max="30" step="5" value="10">
       <div class="ticks"><span>5</span><span>10 · PTN</span><span>15</span><span>20</span><span>25</span><span>30</span></div>
     </div>
     <div class="ctl">
@@ -653,7 +653,7 @@ function renderSens() {
     `<circle cx="${X(cur[0])}" cy="${Y(cur[1])}" r="5" fill="var(--ridership)" stroke="var(--surface)" stroke-width="2"/>` +
     `<rect x="${m.l}" y="${m.t}" width="${w - m.l - m.r}" height="${h - m.t - m.b}" fill="transparent" id="senshit" style="cursor:pointer"/>`;
   const tip = document.getElementById("senstip"), hit = svg.querySelector("#senshit");
-  const tAt = e => { const b = svg.getBoundingClientRect(); const x = (e.clientX - b.left) * (w / b.width); return Math.max(5, Math.min(30, Math.round(5 + (x - m.l) / (w - m.l - m.r) * 25))); };
+  const tAt = e => { const b = svg.getBoundingClientRect(); const x = (e.clientX - b.left) * (w / b.width); return Math.max(5, Math.min(30, 5 * Math.round((5 + (x - m.l) / (w - m.l - m.r) * 25) / 5))); };
   hit.addEventListener("pointermove", e => {
     const t = tAt(e), p = pts.find(q => q[0] === t);
     tip.innerHTML = `Every ${t} min or better<br><b>${pct(p[1])}</b> of hours`; tip.hidden = false;
