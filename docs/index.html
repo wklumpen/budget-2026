@@ -162,6 +162,44 @@ footer { color: var(--muted); font-size: 0.8rem; }
   .split { padding: 16px; }
 }
 @media (prefers-reduced-motion: reduce) { .bar > div { transition: none; } }
+/* Signage theme: warm paper, hard rules, square corners, flat colour blocks */
+:root { --bg: #f2eee4; --surface: #fffdf8; --line: #d6cfbf; --on-r: #fff; --on-c: #12171d; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --on-r: #0f1215; --on-c: #0f1215; } }
+:root[data-theme="dark"] { --on-r: #0f1215; --on-c: #0f1215; }
+header { padding-top: 26px; gap: 14px; }
+header::before { height: 14px; border-radius: 0; }
+.eyebrow { font-weight: 500; }
+h1 { text-transform: uppercase; font-size: clamp(2.6rem, 8.5vw, 5.4rem); line-height: 1; letter-spacing: 0.005em; padding-bottom: 0.06em; }
+h2 { text-transform: uppercase; letter-spacing: 0.04em; font-size: 1.3rem; }
+.lede { font-size: 1.12rem; color: var(--ink); max-width: 68ch; }
+header .lede:first-of-type { font-size: 1.3rem; font-weight: 700; line-height: 1.4; }
+.panel, .split { border: 2px solid var(--ink); border-radius: 0; box-shadow: 6px 6px 0 var(--ink); }
+.split { border-image: none; border-top-width: 2px; padding: 0; gap: 0; }
+.split > .eyebrow { padding: 12px 20px 10px; border-bottom: 2px solid var(--ink); }
+.split-figs { gap: 0; }
+.split .fig { padding: 18px 20px 16px; }
+.split .fig:first-child { background: var(--ridership); color: var(--on-r); }
+.split .fig.right { background: var(--coverage); color: var(--on-c); }
+.split .fig .big { font-size: clamp(4rem, 15vw, 8rem); color: inherit; }
+.split .fig .lbl { text-transform: uppercase; letter-spacing: 0.08em; font-size: 1.05rem; }
+.split .fig .lbl .swatch { display: none; }
+.split .fig .sub { color: inherit; opacity: .9; }
+.split .bar { margin: 16px 20px 0; }
+.split .bar-legend, .split .split-note { margin: 12px 20px 0; }
+.split .split-note { margin-bottom: 18px; }
+.bar { height: 34px; gap: 0; }
+.bar .rl, .bar .cl { border-radius: 0; }
+.seg, .btn, select, .tools input[type=search], .pill { border-radius: 0; }
+.seg, .btn { border: 2px solid var(--ink); }
+.seg button + button { border-left: 2px solid var(--ink); }
+.seg button { font-weight: 700; }
+.pill { border-width: 2px; text-transform: uppercase; letter-spacing: 0.04em; }
+.rtn { display: inline-block; min-width: 2.4ch; text-align: center; background: var(--ink); color: var(--surface); padding: 0 6px; }
+th { border-bottom: 2px solid var(--ink); }
+.tip { border-radius: 0; }
+.tcard h3 { text-transform: uppercase; letter-spacing: 0.03em; }
+.trow .fill, .strip div, .mini div { border-radius: 0; }
+@media (max-width: 520px) { .panel, .split { box-shadow: 4px 4px 0 var(--ink); } }
 </style>
 
 <div class="wrap">
