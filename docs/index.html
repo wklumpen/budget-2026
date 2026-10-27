@@ -50,6 +50,7 @@ p { margin: 0; }
 .eyebrow { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 header { display: grid; gap: 10px; }
+.lede em { font-style: italic; color: var(--ink); }
 
 /* Headline split */
 .split { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 20px; display: grid; gap: 14px; }
@@ -162,7 +163,9 @@ footer { color: var(--muted); font-size: 0.8rem; }
   <header>
     <div class="eyebrow" id="eyebrow">Calgary Transit · fall 2026 schedule</div>
     <h1>Calgary Transit's Two Jobs</h1>
-    <p class="lede">Transit does double duty. Some service is there to carry lots of people, and should be judged on ridership. Some is there so every neighbourhood has a bus, and should be judged on who it reaches. This page sorts the published bus and CTrain schedule into those two jobs by how often each route runs, hour by hour.</p>
+    <p class="lede">Transit provides two different types of service: <em>Frequency</em> service moves lots of people efficiently, and drives ridership. <em>Coverage</em> service ensures that everyone in Calgary is near a stop. Even though these different services have different goals, right now <em>we judge them the same way</em>, usually on productivity.</p>
+    <p class="lede">Right now, our city policies on transit and land use mean that we continue to drift more and more towards coverage-based service. Adding new subdivisions on the edge of the city and not funding our Primary Transit Network properly are two ways that this shift happens.</p>
+    <p class="lede">There is no right or wrong balance of coverage and frequent service, but Calgarians and Council have not been asked how they prefer to balance things. In this page, we explore how that balance works, and how it has changed over time.</p>
   </header>
 
   <section class="split" aria-label="Weekly service split">
