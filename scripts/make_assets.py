@@ -53,12 +53,12 @@ def counted(y):
     return [r for r in DATA[y]["routes"] if r["mode"] != "school"]
 
 
-def split_for(y, thr):
+def split_for(y, thr, lrt=LRT):
     o = dict(Rb=0.0, Rl=0.0, Cb=0.0, Cl=0.0)
     days = DATA[y]["meta"]["days"]
     for r in counted(y):
         k = "l" if r["mode"] == "ctrain" else "b"
-        f = (1 + DH) * (LRT if k == "l" else 1)
+        f = (1 + DH) * (lrt if k == "l" else 1)
         for dt, n in days.items():
             for h, m in enumerate(r["d"][dt]["m"]):
                 if m:
@@ -296,6 +296,131 @@ def chart_map_times(y="2026", thr=10):
                   f"Weekday, fall {y}. After the day peak, almost all of it is coverage service", width=1560)
 
 
+# ---------- per-slide assets for the 5-minute talk ----------
+def chart_s1(y="2026", thr=10):
+    """Cold open: the split bar with names and no numbers."""
+    s = split_for(y, thr)
+    sc = alt.Scale(domain=["Frequency", "Coverage"], range=[TEAL, ORANGE])
+    xs = alt.Scale(domain=[0, s["T"]], nice=False)
+    df = pd.DataFrame({"job": ["Frequency", "Coverage"], "x0": [0, s["R"]], "x1": [s["R"], s["T"]], "xt": [s["R"] / 2, s["R"] + s["C"] / 2], "lbl": ["FREQUENCY", "COVERAGE"]})
+    bar = alt.Chart(df).mark_bar(height=260, stroke=PAPER, strokeWidth=3).encode(x=alt.X("x0:Q", axis=None, scale=xs), x2="x1:Q", color=alt.Color("job:N", scale=sc, legend=None))
+    txt = big_text(df, fontSize=64, baseline="middle", color="#ffffff").encode(x=alt.X("xt:Q", scale=xs, axis=None), text="lbl:N")
+    ch = alt.layer(bar, txt).properties(width=W16, height=260)
+    return finish(ch, "Transit has two jobs", "Every hour of service goes to one or the other", source=False)
+
+
+def chart_s2():
+    """What each job needs: the same three hours at a stop with 10-minute and 60-minute service."""
+    rows = []
+    for lab, gap in (("Every 10 minutes", 10), ("Every 60 minutes", 60)):
+        rows += [dict(row=lab, t=t, gap=gap) for t in range(0, 180, gap)]
+    d = pd.DataFrame(rows)
+    order = ["Every 10 minutes", "Every 60 minutes"]
+    y_enc = alt.Y("row:N", sort=order, title=None, axis=alt.Axis(labelFont=DISPLAY, labelFontSize=44, labelFontWeight=700, labelColor=INK, ticks=False, domain=False, labelPadding=18, labelLimit=0))
+    col = alt.Color("row:N", scale=alt.Scale(domain=order, range=[TEAL, ORANGE]), legend=None)
+    x_enc = alt.X("t:Q", scale=alt.Scale(domain=[-4, 184], nice=False), title=None,
+                  axis=alt.Axis(values=[0, 60, 120, 180], labelExpr="['12:00','13:00','14:00','15:00'][datum.value / 60]", grid=False, tickSize=0))
+    rule = alt.Chart(pd.DataFrame({"row": order})).mark_rule(color=LINE, strokeWidth=3).encode(y=y_enc, x=alt.value(0), x2=alt.value(W16 - 520))
+    dots = alt.Chart(d).mark_circle(size=900, opacity=1).encode(y=y_enc, x=x_enc, color=col)
+    note = pd.DataFrame({"row": order, "t": [90, 90], "n": ["18 buses. Just show up.", "3 buses. Check the schedule."]})
+    txt = alt.Chart(note).mark_text(font=DISPLAY, fontWeight=600, fontSize=40, dy=-64, color=INK).encode(y=y_enc, x=alt.X("t:Q", scale=alt.Scale(domain=[-4, 184], nice=False)), text="n:N")
+    ch = alt.layer(rule, dots, txt).properties(width=W16 - 520, height=420)
+    return finish(ch, "Same three hours, two kinds of service", "Departures from one stop between noon and 3 pm", width=W16 - 520)
+
+
+def chart_s4_split(thr=10):
+    """Where Calgary sits: split bar with CTrain as the darker shade, plus the 2x to 3x range."""
+    s = split_for("2026", thr)
+    lo, hi = (split_for("2026", thr, l) for l in (2.0, 3.0))
+    rs = sorted([lo["R"] / lo["T"], hi["R"] / hi["T"]])
+    xs = alt.Scale(domain=[0, s["T"]], nice=False)
+    segs = [("Frequency, CTrain", 0, s["Rl"], TEAL_D), ("Frequency, bus", s["Rl"], s["R"], TEAL), ("Coverage, bus", s["R"], s["R"] + s["Cb"], ORANGE), ("Coverage, CTrain", s["R"] + s["Cb"], s["T"], ORANGE_D)]
+    d = pd.DataFrame([dict(k=k, x0=a, x1=b, c=c) for k, a, b, c in segs])
+    bar = alt.Chart(d).mark_bar(height=200, stroke=PAPER, strokeWidth=3).encode(x=alt.X("x0:Q", axis=None, scale=xs), x2="x1:Q", color=alt.Color("c:N", scale=None))
+    j = pd.DataFrame({"xt": [s["R"] / 2, s["R"] + s["C"] / 2], "p": [pct(s["R"] / s["T"]), pct(s["C"] / s["T"])], "l": ["FREQUENCY", "COVERAGE"], "c": [TEAL, ORANGE]})
+    xt = alt.X("xt:Q", scale=xs, axis=None)
+    nums = big_text(j, fontSize=170, baseline="bottom", dy=-110).encode(x=xt, text="p:N", color=alt.Color("c:N", scale=None))
+    lbls = big_text(j, fontSize=44, fontWeight=600, baseline="bottom", dy=-285).encode(x=xt, text="l:N", color=alt.Color("c:N", scale=None))
+    ct = pd.DataFrame({"xt": [s["Rl"] / 2], "t": ["CTrain"]})
+    ctt = alt.Chart(ct).mark_text(font=BODY, fontSize=28, color="#ffffff", baseline="middle").encode(x=alt.X("xt:Q", scale=xs, axis=None), text="t:N")
+    ch = alt.layer(bar, nums, lbls, ctt).properties(width=W16, height=200)
+    sub = f"Weekly service hours, fall 2026, every {thr} minutes or better. CTrain (darker) at 2.5× bus hours; at 2× to 3× the frequency share is {pct(rs[0])} to {pct(rs[1])}"
+    return finish(ch, "Where Calgary sits today", sub)
+
+
+def chart_s5_index():
+    """The decade: covered area grew, the 10-minute footprint did not. Index 2016 = 100."""
+    T = TREND["10"]
+    rows = []
+    for y in YEARS:
+        rows.append(dict(year=int(y), series="Area covered by any service", v=TREND["covered"][y] / TREND["covered"]["2016"] * 100))
+        rows.append(dict(year=int(y), series="Area with 10-minute midday service", v=T[y]["area"] / T["2016"]["area"] * 100))
+    d = pd.DataFrame(rows)
+    d["label"] = d["v"].map(lambda v: f"{v:.0f}")
+    names = ["Area covered by any service", "Area with 10-minute midday service"]
+    ys = alt.Scale(domain=[85, 115], nice=False)
+    col = alt.Color("series:N", scale=alt.Scale(domain=names, range=[ORANGE, TEAL]), legend=alt.Legend(title=None, orient="top", labelLimit=0, symbolSize=500, symbolStrokeWidth=8, symbolType="stroke", columnPadding=40))
+    x = alt.X("year:Q", scale=alt.Scale(domain=[2015, 2027], nice=False), title=None, axis=alt.Axis(values=[2016, 2019, 2026], format="d", grid=False))
+    line = alt.Chart(d).mark_line(strokeWidth=7, point=alt.OverlayMarkDef(size=260, filled=True)).encode(x=x, y=alt.Y("v:Q", scale=ys, title="Index, 2016 = 100"), color=col)
+    lab = alt.Chart(d).mark_text(font=DISPLAY, fontWeight=700, fontSize=42, dy=-26).encode(x=x, y=alt.Y("v:Q", scale=ys), text="label:N", color=col)
+    ref = alt.Chart(pd.DataFrame({"y": [100]})).mark_rule(color=INK, strokeDash=[5, 5]).encode(y=alt.Y("y:Q", scale=ys))
+    ch = alt.layer(ref, line, lab).properties(width=W16 - 80, height=520)
+    return finish(ch, "The covered area grew. The frequent area didn't.", "Weekday service area within walking distance (800 m of CTrain, 400 m of a bus stop), fall 2016, 2019 and 2026", width=W16 - 80)
+
+
+# ---------- SVG text and diagram slides ----------
+def svg_slide(name, body, w=1600, h=900):
+    svg = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}">'
+           f'<style>text{{font-family:"{DISPLAY}";fill:{INK}}} .b{{font-weight:700}} .m{{font-weight:500}}</style>'
+           f'<rect width="{w}" height="{h}" fill="{PAPER}"/>{body}</svg>')
+    (OUT / f"{name}.svg").write_text(svg)
+    (OUT / f"{name}.png").write_bytes(vlc.svg_to_png(svg, scale=1.2))
+    print("wrote", name)
+
+
+def box(x, y, w, h, label, fill, fg="#ffffff", size=44, sub=None):
+    t = f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="{fill}"/>'
+    if sub:
+        t += f'<text x="{x + w / 2}" y="{y + h / 2 - 6}" text-anchor="middle" class="b" font-size="{size}" style="fill:{fg}">{label}</text>'
+        t += f'<text x="{x + w / 2}" y="{y + h / 2 + 34}" text-anchor="middle" class="m" font-size="{size * 0.6}" style="fill:{fg}">{sub}</text>'
+    else:
+        t += f'<text x="{x + w / 2}" y="{y + h / 2 + size / 3}" text-anchor="middle" class="b" font-size="{size}" style="fill:{fg}">{label}</text>'
+    return t
+
+
+def arrow(x1, y1, x2, y2, color):
+    return (f'<defs><marker id="a{color[1:]}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="3.2" markerHeight="3.2" orient="auto"><path d="M0,0L10,5L0,10z" fill="{color}"/></marker></defs>'
+            f'<path d="M{x1},{y1} C{x1 + 140},{y1} {x2 - 140},{y2} {x2},{y2}" fill="none" stroke="{color}" stroke-width="6" marker-end="url(#a{color[1:]})"/>')
+
+
+def slide_s6():
+    b = '<text x="60" y="110" class="b" font-size="84">Land use sets the split</text>'
+    b += f'<text x="60" y="162" font-size="34" style="fill:{INK2}">Decisions made one at a time add up to the balance between the two jobs</text>'
+    ins = [(250, "New communities on the edge", ORANGE), (400, "Rezoning, and rezoning that doesn't happen", ORANGE), (550, "Dense growth along corridors", TEAL), (700, "Transit budget decisions", INK)]
+    for y, lab, c in ins:
+        b += box(60, y, 620, 100, lab, "#fffdf8", fg=INK, size=36).replace("<rect ", f'<rect stroke="{c}" stroke-width="6" ', 1)
+    b += box(1040, 300, 500, 180, "Coverage line", ORANGE, size=60, sub="not visible in the budget today")
+    b += box(1040, 560, 500, 180, "Frequency line", TEAL, size=60, sub="not visible in the budget today")
+    b += arrow(680, 300, 1040, 370, ORANGE) + arrow(680, 450, 1040, 405, ORANGE) + arrow(680, 600, 1040, 645, TEAL)
+    b += arrow(680, 750, 1040, 450, INK) + arrow(680, 750, 1040, 690, INK)
+    b += f'<text x="60" y="860" font-size="24" style="fill:{MUTED}">{SOURCE}</text>'
+    svg_slide("s6_land_use_diagram", b)
+
+
+def slide_s7():
+    b = '<text x="60" y="130" class="b" font-size="110">The ask</text>'
+    b += f'<rect x="60" y="190" width="120" height="14" fill="{ORANGE}"/><rect x="180" y="190" width="120" height="14" fill="{TEAL}"/>'
+    b += f'<text x="60" y="400" class="b" font-size="82" style="fill:{ORANGE}">1</text><text x="150" y="400" class="b" font-size="74">Show the frequency and coverage split</text><text x="150" y="480" class="b" font-size="74">as a visible budget line.</text>'
+    b += f'<text x="60" y="690" class="b" font-size="82" style="fill:{TEAL}">2</text><text x="150" y="690" class="b" font-size="74">Have land use decisions report their</text><text x="150" y="770" class="b" font-size="74">effect on each line.</text>'
+    svg_slide("s7_the_ask", b)
+
+
+def slide_s8():
+    b = f'<rect x="60" y="150" width="120" height="14" fill="{ORANGE}"/><rect x="180" y="150" width="120" height="14" fill="{TEAL}"/>'
+    b += '<text x="60" y="440" class="b" font-size="130">Which balance do</text><text x="60" y="590" class="b" font-size="130">Calgarians want?</text>'
+    svg_slide("s8_close_question", b)
+
+
 if __name__ == "__main__":
     for t in (10, 15):
         for k in ("visits", "area", "hours"):
@@ -307,3 +432,12 @@ if __name__ == "__main__":
     save(chart_map_single(), "06_map_2026_noon")
     save(chart_map_years(), "07_map_years_noon")
     save(chart_map_times(), "08_map_2026_noon_vs_9pm")
+    save(chart_map_single(thr=15), "09_map_2026_noon_15min")
+    save(chart_s1(), "s1_cold_open_bar")
+    save(chart_s2(), "s2_ten_vs_sixty_minutes")
+    save(chart_s4_split(10), "s4_split_ctrain_10min")
+    save(chart_s4_split(15), "s4_split_ctrain_15min")
+    save(chart_s5_index(), "s5_covered_vs_frequent_area")
+    slide_s6()
+    slide_s7()
+    slide_s8()
