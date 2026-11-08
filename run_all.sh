@@ -23,4 +23,5 @@ mkdir -p data results docs
 "$PY" -I scripts/stoplevel_multi.py "2016 Tue 18 Oct" feeds/2016 20161018 "2019 Tue 22 Oct" feeds/2019 20191022 "2026 Tue 3 Nov" feeds/2026 20261103 > results/stop_level.txt
 "$PY" -I scripts/coverage_area.py 2016 feeds/2016 20161018 2019 feeds/2019 20191022 2026 feeds/2026 20261103 > results/coverage_area.txt
 "$PY" -I scripts/make_assets.py assets
+"$PY" -I scripts/make_assets.py assets/bare --bare
 echo "done: see results/ and docs/index.html"

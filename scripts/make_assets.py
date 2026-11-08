@@ -1,6 +1,8 @@
 """Presentation assets (PNG + SVG) built with Altair from the same data as the explorer page.
 
-Usage: python3 -I make_assets.py <out_dir>        (needs altair>=5, vl-convert-python, pandas, numpy)
+Usage: python3 -I make_assets.py <out_dir> [--bare]   (needs altair>=5, vl-convert-python, pandas, numpy)
+--bare renders charts without title, subtitle and source, writes those to <out_dir>/slides.json for the deck,
+and skips the SVG text slides (the deck builds those as editable text).
 Reads data/data{2016,2019,2026}.json and data/trend.json relative to this script's parent folder.
 Method matches page/template.html: smoothed trips/hr per direction averaged across directions, frequent if
 >= 60/threshold, 10% deadhead, CTrain at 2.5x bus hours, school specials excluded.
@@ -15,7 +17,9 @@ import pandas as pd
 import vl_convert as vlc
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = Path(sys.argv[1])
+BARE = "--bare" in sys.argv[1:]
+OUT = Path([a for a in sys.argv[1:] if a != "--bare"][0])
+META, LAST = {}, {}
 OUT.mkdir(parents=True, exist_ok=True)
 vlc.register_font_directory(str(Path(__file__).resolve().parent / "fonts"))
 
@@ -88,15 +92,17 @@ def pct(x):
 
 # ---------- shared look ----------
 def finish(chart, title, subtitle, width=W16, source=True):
-    """Title block plus a source line, then page-wide config."""
+    """Title block plus a source line, then page-wide config. In bare mode the texts go to slides.json instead."""
+    LAST.clear()
+    LAST.update(title=title, subtitle=subtitle, source=SOURCE if source else "")
     parts = [chart]
-    if source:
+    if source and not BARE:
         parts.append(alt.Chart(pd.DataFrame({"t": [SOURCE]})).mark_text(align="left", x=0, baseline="top", font=BODY, fontSize=20, color=MUTED)
                      .encode(text="t:N").properties(width=width, height=24))
-    out = alt.vconcat(*parts, spacing=12).properties(
-        title=alt.TitleParams(text=title, subtitle=subtitle, anchor="start", font=DISPLAY, fontSize=64, fontWeight=700, color=INK,
-                              subtitleFont=BODY, subtitleFontSize=30, subtitleColor=INK2, subtitlePadding=8, offset=26)
-    )
+    out = alt.vconcat(*parts, spacing=12)
+    if not BARE:
+        out = out.properties(title=alt.TitleParams(text=title, subtitle=subtitle, anchor="start", font=DISPLAY, fontSize=64, fontWeight=700, color=INK,
+                                                   subtitleFont=BODY, subtitleFontSize=30, subtitleColor=INK2, subtitlePadding=8, offset=26))
     return (out.configure(background=PAPER, padding={"left": 40, "right": 40, "top": 34, "bottom": 28})
             .configure_view(stroke=None)
             .configure_axis(labelFont=BODY, titleFont=BODY, labelColor=INK2, titleColor=INK2, labelFontSize=26, titleFontSize=26,
@@ -107,6 +113,7 @@ def finish(chart, title, subtitle, width=W16, source=True):
 def save(chart, name):
     chart.save(str(OUT / f"{name}.png"), scale_factor=1.2)
     chart.save(str(OUT / f"{name}.svg"))
+    META[name] = dict(LAST)
     print("wrote", name)
 
 
@@ -312,22 +319,23 @@ def chart_s1(y="2026", thr=10):
 
 
 def chart_s2():
-    """What each job needs: the same three hours at a stop with 10-minute and 60-minute service."""
+    """What each job needs: the same three hours at a stop with 10-minute and 30-minute service."""
     rows = []
-    for lab, gap in (("Every 10 minutes", 10), ("Every 60 minutes", 60)):
+    for lab, gap in (("Every 10 minutes", 10), ("Every 30 minutes", 30)):
         rows += [dict(row=lab, t=t, gap=gap) for t in range(0, 180, gap)]
     d = pd.DataFrame(rows)
-    order = ["Every 10 minutes", "Every 60 minutes"]
+    order = ["Every 10 minutes", "Every 30 minutes"]
     y_enc = alt.Y("row:N", sort=order, title=None, axis=alt.Axis(labelFont=DISPLAY, labelFontSize=44, labelFontWeight=700, labelColor=INK, ticks=False, domain=False, labelPadding=18, labelLimit=0))
     col = alt.Color("row:N", scale=alt.Scale(domain=order, range=[TEAL, ORANGE]), legend=None)
     x_enc = alt.X("t:Q", scale=alt.Scale(domain=[-4, 184], nice=False), title=None,
                   axis=alt.Axis(values=[0, 60, 120, 180], labelExpr="['12:00','13:00','14:00','15:00'][datum.value / 60]", grid=False, tickSize=0))
     rule = alt.Chart(pd.DataFrame({"row": order})).mark_rule(color=LINE, strokeWidth=3).encode(y=y_enc, x=alt.value(0), x2=alt.value(W16 - 520))
     dots = alt.Chart(d).mark_circle(size=900, opacity=1).encode(y=y_enc, x=x_enc, color=col)
-    note = pd.DataFrame({"row": order, "t": [90, 90], "n": ["18 buses. Just show up.", "3 buses. Check the schedule."]})
+    note = pd.DataFrame({"row": order, "t": [90, 90], "n": ["18 buses. Just show up.", "6 buses. Check the schedule."]})
     txt = alt.Chart(note).mark_text(font=DISPLAY, fontWeight=600, fontSize=40, dy=-64, color=INK).encode(y=y_enc, x=alt.X("t:Q", scale=alt.Scale(domain=[-4, 184], nice=False)), text="n:N")
-    ch = alt.layer(rule, dots, txt).properties(width=W16 - 520, height=420)
-    return finish(ch, "Same three hours, two kinds of service", "Departures from one stop between noon and 3 pm", width=W16 - 520)
+    # in bare mode the deck sets the two callouts as editable text
+    ch = alt.layer(rule, dots, *([] if BARE else [txt])).properties(width=W16 - 520, height=420)
+    return finish(ch, "Same three hours, two kinds of service", "Departures from one stop between noon and 3 pm", width=W16 - 520, source=False)
 
 
 def chart_s4_split(thr=10):
@@ -490,13 +498,16 @@ if __name__ == "__main__":
     save(chart_map_times(), "08_map_2026_noon_vs_9pm")
     save(chart_map_single(thr=15), "09_map_2026_noon_15min")
     save(chart_s1(), "s1_cold_open_bar")
-    save(chart_s2(), "s2_ten_vs_sixty_minutes")
+    save(chart_s2(), "s2_ten_vs_thirty_minutes")
     save(chart_s4_split(10), "s4_split_ctrain_10min")
     save(chart_s4_split(15), "s4_split_ctrain_15min")
     save(chart_s5_index(), "s5_covered_vs_frequent_area")
-    slide_s3()
-    slide_s6()
-    slide_s7()
-    slide_s8()
-    slide_method()
-    slide_tradeoffs()
+    if BARE:
+        (OUT / "slides.json").write_text(json.dumps(META, indent=1, ensure_ascii=False))
+    else:
+        slide_s3()
+        slide_s6()
+        slide_s7()
+        slide_s8()
+        slide_method()
+        slide_tradeoffs()

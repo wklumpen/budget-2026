@@ -1,0 +1,97 @@
+{
+ "03_trend_visits_10min": {
+  "title": "Midday stop-visits every 10 min or better",
+  "subtitle": "Share of all stop-visits, weekdays 10:00 to 15:00",
+  "source": "Source: Calgary Transit GTFS, fall schedules, weekday service. Analysis: Willem Klumpenhouwer. Supply, not ridership."
+ },
+ "03_trend_area_10min": {
+  "title": "Area with 10-minute midday service",
+  "subtitle": "km² within 800 m of CTrain / 400 m of a bus stop; the pale bar is the whole covered area",
+  "source": "Source: Calgary Transit GTFS, fall schedules, weekday service. Analysis: Willem Klumpenhouwer. Supply, not ridership."
+ },
+ "03_trend_hours_10min": {
+  "title": "Bus hours on routes every 10 min or better",
+  "subtitle": "Weekly bus revenue hours when the route meets the threshold",
+  "source": "Source: Calgary Transit GTFS, fall schedules, weekday service. Analysis: Willem Klumpenhouwer. Supply, not ridership."
+ },
+ "03_trend_visits_15min": {
+  "title": "Midday stop-visits every 15 min or better",
+  "subtitle": "Share of all stop-visits, weekdays 10:00 to 15:00",
+  "source": "Source: Calgary Transit GTFS, fall schedules, weekday service. Analysis: Willem Klumpenhouwer. Supply, not ridership."
+ },
+ "03_trend_area_15min": {
+  "title": "Area with 15-minute midday service",
+  "subtitle": "km² within 800 m of CTrain / 400 m of a bus stop; the pale bar is the whole covered area",
+  "source": "Source: Calgary Transit GTFS, fall schedules, weekday service. Analysis: Willem Klumpenhouwer. Supply, not ridership."
+ },
+ "03_trend_hours_15min": {
+  "title": "Bus hours on routes every 15 min or better",
+  "subtitle": "Weekly bus revenue hours when the route meets the threshold",
+  "source": "Source: Calgary Transit GTFS, fall schedules, weekday service. Analysis: Willem Klumpenhouwer. Supply, not ridership."
+ },
+ "01_headline_split_2026": {
+  "title": "Transit's conflicting priorities",
+  "subtitle": "Share of weekly service hours (bus and CTrain) running every 10 minutes or better, fall 2026",
+  "source": "Source: Calgary Transit GTFS, fall schedules, weekday service. Analysis: Willem Klumpenhouwer. Supply, not ridership."
+ },
+ "02_split_by_year": {
+  "title": "The balance has drifted toward coverage",
+  "subtitle": "Every 10 min or better. Frequency hours -22%, coverage hours +16%, total +6%, 2016 to 2026",
+  "source": "Source: Calgary Transit GTFS, fall schedules, weekday service. Analysis: Willem Klumpenhouwer. Supply, not ridership."
+ },
+ "04_time_of_day_2026": {
+  "title": "Frequency is a daytime service",
+  "subtitle": "Weekday service hours by clock hour, fall 2026, frequent = every 10 minutes or better",
+  "source": "Source: Calgary Transit GTFS, fall schedules, weekday service. Analysis: Willem Klumpenhouwer. Supply, not ridership."
+ },
+ "05_threshold_sensitivity": {
+  "title": "Wherever you draw the line, frequency lost ground",
+  "subtitle": "Frequency share of weekly service hours by threshold. 2026 sits below 2016 at every threshold",
+  "source": "Source: Calgary Transit GTFS, fall schedules, weekday service. Analysis: Willem Klumpenhouwer. Supply, not ridership."
+ },
+ "06_map_2026_noon": {
+  "title": "The network at noon",
+  "subtitle": "Bus routes and CTrain (heavy lines) at 12:00 on a weekday, fall 2026, coloured by how often they run",
+  "source": "Source: Calgary Transit GTFS, fall schedules, weekday service. Analysis: Willem Klumpenhouwer. Supply, not ridership."
+ },
+ "07_map_years_noon": {
+  "title": "The frequent network, 2016 to 2026",
+  "subtitle": "Weekday at 12:00. Teal runs every 10 minutes or better; orange is coverage service",
+  "source": "Source: Calgary Transit GTFS, fall schedules, weekday service. Analysis: Willem Klumpenhouwer. Supply, not ridership."
+ },
+ "08_map_2026_noon_vs_9pm": {
+  "title": "The same network, two times of day",
+  "subtitle": "Weekday, fall 2026. After the day peak, almost all of it is coverage service",
+  "source": "Source: Calgary Transit GTFS, fall schedules, weekday service. Analysis: Willem Klumpenhouwer. Supply, not ridership."
+ },
+ "09_map_2026_noon_15min": {
+  "title": "The network at noon",
+  "subtitle": "Bus routes and CTrain (heavy lines) at 12:00 on a weekday, fall 2026, coloured by how often they run",
+  "source": "Source: Calgary Transit GTFS, fall schedules, weekday service. Analysis: Willem Klumpenhouwer. Supply, not ridership."
+ },
+ "s1_cold_open_bar": {
+  "title": "Transit has two jobs",
+  "subtitle": "Every hour of service goes to one or the other",
+  "source": ""
+ },
+ "s2_ten_vs_thirty_minutes": {
+  "title": "Same three hours, two kinds of service",
+  "subtitle": "Departures from one stop between noon and 3 pm",
+  "source": ""
+ },
+ "s4_split_ctrain_10min": {
+  "title": "Where Calgary sits today",
+  "subtitle": "Weekly service hours, fall 2026, every 10 minutes or better. CTrain (darker) at 2.5× bus hours; at 2× to 3× the frequency share is 16% to 20%",
+  "source": "Source: Calgary Transit GTFS, fall schedules, weekday service. Analysis: Willem Klumpenhouwer. Supply, not ridership."
+ },
+ "s4_split_ctrain_15min": {
+  "title": "Where Calgary sits today",
+  "subtitle": "Weekly service hours, fall 2026, every 15 minutes or better. CTrain (darker) at 2.5× bus hours; at 2× to 3× the frequency share is 27% to 32%",
+  "source": "Source: Calgary Transit GTFS, fall schedules, weekday service. Analysis: Willem Klumpenhouwer. Supply, not ridership."
+ },
+ "s5_covered_vs_frequent_area": {
+  "title": "The covered area grew. The frequent area didn't.",
+  "subtitle": "Weekday service area within walking distance (800 m of CTrain, 400 m of a bus stop), fall 2016, 2019 and 2026",
+  "source": "Source: Calgary Transit GTFS, fall schedules, weekday service. Analysis: Willem Klumpenhouwer. Supply, not ridership."
+ }
+}

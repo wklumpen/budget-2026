@@ -20,7 +20,7 @@ Same method as the explorer page: frequent = every 10 minutes or better (15 for 
 | File | Slide |
 | --- | --- |
 | s1_cold_open_bar | 1. The split bar, names only, no numbers |
-| s2_ten_vs_sixty_minutes | 2. 18 departures vs 3 in the same three hours |
+| s2_ten_vs_thirty_minutes | 2. 18 departures vs 6 in the same three hours |
 | s3_routeahead_quote | 3. RouteAhead quotes (checked against the Council-approved PDF, pages 5 and 40) |
 | 01_headline_split_2026, s4_split_ctrain_{10,15}min | 4. Where Calgary sits, CTrain as the darker shade, with the 2x to 3x range |
 | 06_map_2026_noon, 09_map_2026_noon_15min | 4. The network by job, at 10 and 15 minutes |
@@ -33,4 +33,4 @@ Same method as the explorer page: frequent = every 10 minutes or better (15 for 
 No chart shows population, because there is no single verified source for all three years.
 
 
-The council deck, `presentation/two-jobs-council.pptx`, puts one asset on each slide, with speaker notes. Build it with `NODE_PATH=<dir containing pptxgenjs> node presentation/build_deck.js` after the assets.
+The council deck, `presentation/two-jobs-council.pptx`, has editable titles, subtitles, sources and narrative; only the charts are images. Those come from `assets/bare/` (`make_assets.py assets/bare --bare`, also run by `run_all.sh`), which has the charts without their titles plus `slides.json` with the texts. Build the deck with `NODE_PATH=<dir containing pptxgenjs> node presentation/build_deck.js`.
