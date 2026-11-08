@@ -216,10 +216,12 @@ def chart_sens():
     d["label"] = d["share"].map(pct)
     color = alt.Color("year:N", scale=alt.Scale(domain=YEARS, range=["#9aa3ad", "#5f6a76", TEAL]), legend=None)
     line = alt.Chart(d).mark_line(strokeWidth=5).encode(x=alt.X("thr:Q", title="Counts as frequent: every ___ minutes or better", scale=alt.Scale(domain=[10, 30], nice=False), axis=alt.Axis(values=[10, 15, 20, 25, 30], format="d", grid=False)),
-                                                        y=alt.Y("share:Q", title="Share of weekly service hours", axis=alt.Axis(format="%"), scale=alt.Scale(domain=[0, 0.7])), color=color)
+                                                        y=alt.Y("share:Q", title="Share of weekly service hours", axis=alt.Axis(format="%"), scale=alt.Scale(domain=[0, 1], nice=False)), color=color)
     end = d[d.thr == 30]
-    end = end.assign(dy=end["year"].map({"2016": -14, "2019": -3, "2026": 18}))
-    lab = alt.Chart(end).mark_text(font=DISPLAY, fontWeight=700, fontSize=30, align="left", dx=12).encode(x="thr:Q", y="share:Q", text="year:N", color=color, yOffset="dy:Q")
+    # end values sit within a few points of each other, so stack the labels around 2019's value
+    mid = end.loc[end.year == "2019", "share"].iloc[0]
+    end = end.assign(ly=end["year"].map({"2016": mid + 0.06, "2019": mid, "2026": mid - 0.06}))
+    lab = alt.Chart(end).mark_text(font=DISPLAY, fontWeight=700, fontSize=30, align="left", dx=12).encode(x="thr:Q", y=alt.Y("ly:Q", scale=alt.Scale(domain=[0, 1], nice=False)), text="year:N", color=color)
     chart = alt.layer(line, lab).properties(width=W16 - 220, height=520)
     return finish(chart, "Wherever you draw the line, frequency lost ground", "Frequency share of weekly service hours by threshold. 2026 sits below 2016 at every threshold", width=W16 - 220)
 
@@ -407,6 +409,46 @@ def slide_s6():
     svg_slide("s6_land_use_diagram", b)
 
 
+def slide_s3():
+    """RouteAhead quotes, checked against the Council-approved PDF (July 2023), printed pages 5 and 40."""
+    b = '<text x="60" y="120" class="b" font-size="96">Council already chose frequency</text>'
+    b += f'<rect x="60" y="160" width="120" height="14" fill="{ORANGE}"/><rect x="180" y="160" width="120" height="14" fill="{TEAL}"/>'
+    q1 = ["“By implementing RouteAhead, Calgary", "will shift more towards frequency", "to build ridership …”"]
+    b += "".join(f'<text x="60" y="{310 + i * 82}" class="b" font-size="72" style="fill:{TEAL}">{t}</text>' for i, t in enumerate(q1))
+    q2 = ["The Primary Transit Network: “service running every 10 minutes or better,", "at least 15 hours a day, seven days a week.”"]
+    b += "".join(f'<text x="60" y="{620 + i * 54}" class="m" font-size="44">{t}</text>' for i, t in enumerate(q2))
+    b += f'<text x="60" y="860" font-size="26" style="fill:{MUTED}">RouteAhead, Calgary Transit’s 30-Year Strategic Plan. Approved by Council July 2023. Pages 5 and 40.</text>'
+    svg_slide("s3_routeahead_quote", b)
+
+
+def slide_method():
+    b = '<text x="60" y="120" class="b" font-size="96">Method</text>'
+    rows = [
+        ("Source", "Calgary Transit GTFS schedules, fall 2016, 2019 and 2026. Scheduled service, not observed."),
+        ("Week", "One reference Tue, Fri, Sat and Sun per year. Week = 4 × Mon–Thu + Fri + Sat + Sun."),
+        ("Hours", "First to last stop of each trip, apportioned to clock hours. 10% deadhead on all service."),
+        ("Frequency", "A route-hour counts if it averages 6+ trips per hour per direction (3-hour smoothing)."),
+        ("CTrain", "Counted at 2.5× bus hours. The result holds between 2× and 3×."),
+        ("Excluded", "School specials (routes 600–899). This measures supply, not ridership."),
+    ]
+    for i, (k, v) in enumerate(rows):
+        y = 250 + i * 105
+        b += f'<text x="60" y="{y}" class="b" font-size="44" style="fill:{TEAL}">{k}</text><text x="340" y="{y}" class="m" font-size="36">{v}</text>'
+    svg_slide("b_method", b)
+
+
+def slide_tradeoffs():
+    b = '<text x="60" y="120" class="b" font-size="96">Either direction is a choice</text>'
+    cards = [(60, ORANGE, "Lean toward coverage", ["Service near more people,", "less often.", "Ridership will likely shrink."]),
+             (820, TEAL, "Lean toward frequency", ["Service more often", "on fewer corridors.", "Ridership will likely grow,", "with a plan for edge areas."])]
+    for x, c, head, lines in cards:
+        b += f'<rect x="{x}" y="200" width="720" height="560" fill="{c}"/>'
+        b += f'<text x="{x + 50}" y="300" class="b" font-size="64" style="fill:#ffffff">{head}</text>'
+        b += "".join(f'<text x="{x + 50}" y="{400 + j * 66}" class="m" font-size="48" style="fill:#ffffff">{t}</text>' for j, t in enumerate(lines))
+    b += f'<text x="60" y="850" class="m" font-size="34">The point is to choose it on purpose, in the open.</text>'
+    svg_slide("b_tradeoffs", b)
+
+
 ASKS = [
     ("Budget the two services separately.",
      ["In the 2027–2030 budget, show a coverage line and a frequency line,", "and have Council set the balance between them on purpose."]),
@@ -452,6 +494,9 @@ if __name__ == "__main__":
     save(chart_s4_split(10), "s4_split_ctrain_10min")
     save(chart_s4_split(15), "s4_split_ctrain_15min")
     save(chart_s5_index(), "s5_covered_vs_frequent_area")
+    slide_s3()
     slide_s6()
     slide_s7()
     slide_s8()
+    slide_method()
+    slide_tradeoffs()

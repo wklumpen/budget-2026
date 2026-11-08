@@ -21,12 +21,16 @@ Same method as the explorer page: frequent = every 10 minutes or better (15 for 
 | --- | --- |
 | s1_cold_open_bar | 1. The split bar, names only, no numbers |
 | s2_ten_vs_sixty_minutes | 2. 18 departures vs 3 in the same three hours |
+| s3_routeahead_quote | 3. RouteAhead quotes (checked against the Council-approved PDF, pages 5 and 40) |
 | 01_headline_split_2026, s4_split_ctrain_{10,15}min | 4. Where Calgary sits, CTrain as the darker shade, with the 2x to 3x range |
 | 06_map_2026_noon, 09_map_2026_noon_15min | 4. The network by job, at 10 and 15 minutes |
 | s5_covered_vs_frequent_area, 03_trend_area_10min, 07_map_years_noon | 5. Covered area up 10%, the 10-minute footprint flat |
 | s6_land_use_diagram | 6. Land use and budget decisions into the two lines |
 | s7_the_ask | 7. Three requests for Council |
 | s8_close_question | Close |
+| b_method, b_tradeoffs | Backup: method, and the two directions |
 
-Slide 3 (operating ratio) has no graphic. No chart shows population, because there is no single verified source for all three years.
+No chart shows population, because there is no single verified source for all three years.
 
+
+The council deck, `presentation/two-jobs-council.pptx`, puts one asset on each slide, with speaker notes. Build it with `NODE_PATH=<dir containing pptxgenjs> node presentation/build_deck.js` after the assets.
