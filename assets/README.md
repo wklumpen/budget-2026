@@ -25,7 +25,7 @@ Same method as the explorer page: frequent = every 10 minutes or better (15 for 
 | 06_map_2026_noon, 09_map_2026_noon_15min | 4. The network by job, at 10 and 15 minutes |
 | s5_covered_vs_frequent_area, 03_trend_area_10min, 07_map_years_noon | 5. Covered area up 10%, the 10-minute footprint flat |
 | s6_land_use_diagram | 6. Land use and budget decisions into the two lines |
-| s7_the_ask | 7. The ask |
+| s7_the_ask | 7. Three requests for Council |
 | s8_close_question | Close |
 
 Slide 3 (operating ratio) has no graphic. No chart shows population, because there is no single verified source for all three years.

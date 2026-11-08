@@ -407,11 +407,25 @@ def slide_s6():
     svg_slide("s6_land_use_diagram", b)
 
 
+ASKS = [
+    ("Budget the two services separately.",
+     ["In the 2027–2030 budget, show a coverage line and a frequency line,", "and have Council set the balance between them on purpose."]),
+    ("Show the impact to both services.",
+     ["New community decisions, other major land use changes, and major service adjustments and network",
+      "reconfiguration should report their effect on the coverage and frequency lines before a decision is made."]),
+    ("Ask Calgarians to help decide the balance.",
+     ["Put the trade-off to the public directly."]),
+]
+
+
 def slide_s7():
-    b = '<text x="60" y="130" class="b" font-size="110">The ask</text>'
-    b += f'<rect x="60" y="190" width="120" height="14" fill="{ORANGE}"/><rect x="180" y="190" width="120" height="14" fill="{TEAL}"/>'
-    b += f'<text x="60" y="400" class="b" font-size="82" style="fill:{ORANGE}">1</text><text x="150" y="400" class="b" font-size="74">Show the frequency and coverage split</text><text x="150" y="480" class="b" font-size="74">as a visible budget line.</text>'
-    b += f'<text x="60" y="690" class="b" font-size="82" style="fill:{TEAL}">2</text><text x="150" y="690" class="b" font-size="74">Have land use decisions report their</text><text x="150" y="770" class="b" font-size="74">effect on each line.</text>'
+    b = '<text x="60" y="120" class="b" font-size="96">Three requests for Council</text>'
+    b += f'<rect x="60" y="160" width="120" height="14" fill="{ORANGE}"/><rect x="180" y="160" width="120" height="14" fill="{TEAL}"/>'
+    for i, ((head, lines), c) in enumerate(zip(ASKS, (ORANGE, TEAL, INK))):
+        y = 300 + i * 205
+        b += f'<text x="60" y="{y}" class="b" font-size="72" style="fill:{c}">{i + 1}</text><text x="140" y="{y}" class="b" font-size="62">{head}</text>'
+        b += "".join(f'<text x="140" y="{y + 50 + j * 40}" class="m" font-size="31" style="fill:{INK2}">{t}</text>' for j, t in enumerate(lines))
+    b += f'<text x="60" y="860" class="m" font-size="34" style="fill:{INK}">This is a question about balance, not a call to cut coverage.</text>'
     svg_slide("s7_the_ask", b)
 
 
